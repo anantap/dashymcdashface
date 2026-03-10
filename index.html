@@ -172,8 +172,6 @@ body::before {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 6px;
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
@@ -706,7 +704,7 @@ async function loadCalendar() {
       if (isCancelled) badge = '<span class="cal-badge badge-cancel">geannuleerd</span>';
 
       return `<div class="cal-item${isNow?' now':''}">
-        <div class="cal-time">${allDay ? 'Hele dag' : s ? fmt(s) : '—'}</div>
+        <div class="cal-time">${allDay ? 'Hele dag' : s ? (e ? `${fmt(s)} – ${fmt(e)}` : fmt(s)) : '—'}</div>
         <div class="cal-body">
           <div class="cal-title">${ev.summary || '(geen titel)'}</div>
           ${attendees ? `<div class="cal-people">${attendees}</div>` : ''}
