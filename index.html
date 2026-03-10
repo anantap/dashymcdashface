@@ -244,6 +244,28 @@ body::before {
 
 .mail-time { font-family: var(--mono); font-size: 14px; color: var(--text-dim); white-space: nowrap; }
 
+.mail-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+.mail-action-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 2px 7px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mail-action-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.mail-action-btn.archive:hover { border-color: var(--accent2); color: var(--accent2); }
+.mail-action-btn.read:hover { border-color: var(--blue); color: var(--blue); }
+.mail-item.removing { opacity: 0; transition: opacity 0.25s; }
+
 /* ── HUCKLEBERRY ── */
 .huck-grid {
   display: grid;
@@ -655,7 +677,7 @@ function initGoogleAuth() {
 
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.readonly',
+    scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.modify',
     callback: (resp) => {
       if (resp.access_token) {
         googleAccessToken = resp.access_token;
@@ -836,7 +858,7 @@ async function loadMail() {
     // Fetch metadata for each (parallel, limited)
     const details = await Promise.all(
       messages.slice(0,15).map(m =>
-        gapi(`/users/me/messages/${m.id}?format=metadata&metadataHeaders=From,Subject,Date`)
+        gapi(`/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`)
           .catch(() => null)
       )
     );
@@ -865,12 +887,19 @@ async function loadMail() {
 
       const dotClass = isCal ? 'dot-calendar' : 'dot-unread';
 
-      mailItems.push(`<div class="mail-item">
+      const safeFrom = fromName.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const safeSub = subject.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+      mailItems.push(`<div class="mail-item" id="mail-${msg.id}">
         <div class="mail-dot ${dotClass}"></div>
         <div class="mail-body">
-          <div class="mail-from">${fromName}</div>
-          <div class="mail-subject">${subject}</div>
+          <div class="mail-from">${safeFrom}</div>
+          <div class="mail-subject">${safeSub}</div>
           ${tag}
+          <div class="mail-actions">
+            <button class="mail-action-btn archive" onclick="archiveMail('${msg.id}')">Archiveer</button>
+            <button class="mail-action-btn read" onclick="markAsRead('${msg.id}')">Gelezen</button>
+          </div>
         </div>
         <div class="mail-time">${timeAgo(date)}</div>
       </div>`);
@@ -881,6 +910,37 @@ async function loadMail() {
   } catch(e) {
     el.innerHTML = `<div class="empty">Fout: ${e.message}</div>`;
   }
+}
+
+async function gapiPost(path, body) {
+  const resp = await fetch('https://www.googleapis.com/gmail/v1' + path, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + googleAccessToken, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!resp.ok) throw new Error(resp.status);
+  return resp.json();
+}
+
+function removeMailItem(id) {
+  const el = document.getElementById('mail-' + id);
+  if (!el) return;
+  el.classList.add('removing');
+  setTimeout(() => el.remove(), 260);
+}
+
+async function archiveMail(id) {
+  try {
+    await gapiPost(`/users/me/messages/${id}/modify`, { removeLabelIds: ['INBOX'] });
+    removeMailItem(id);
+  } catch(e) { alert('Archiveren mislukt: ' + e.message); }
+}
+
+async function markAsRead(id) {
+  try {
+    await gapiPost(`/users/me/messages/${id}/modify`, { removeLabelIds: ['UNREAD'] });
+    removeMailItem(id);
+  } catch(e) { alert('Markeren mislukt: ' + e.message); }
 }
 
 // ══════════════════════════════════════════════════════
