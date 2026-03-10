@@ -192,6 +192,21 @@ body::before {
   flex: 1;
 }
 
+#jona-schedule {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.jona-row {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+.jona-row:first-child { border-top: none; }
+
 /* ── SECTION ── */
 .section { margin-bottom: 20px; }
 
@@ -566,10 +581,14 @@ function loadJonaSchedule() {
   const tomorrow = (today + 1) % 7;
   const el = document.getElementById('jona-schedule');
   el.innerHTML = `
-    <div class="card-label">Vandaag</div>
-    <div class="card-value">${schedule[today]}</div>
-    <div class="card-label" style="margin-top:10px;">Morgen</div>
-    <div class="card-value">${schedule[tomorrow]}</div>
+    <div class="jona-row">
+      <div class="card-label">Vandaag</div>
+      <div class="card-value">${schedule[today]}</div>
+    </div>
+    <div class="jona-row">
+      <div class="card-label">Morgen</div>
+      <div class="card-value">${schedule[tomorrow]}</div>
+    </div>
   `;
 }
 
