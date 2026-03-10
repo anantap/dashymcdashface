@@ -445,6 +445,28 @@ body::before {
   display: none;
 }
 .config-banner.show { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .page { padding: 0 16px 32px; }
+  .masthead {
+    grid-template-columns: 1fr 1fr;
+    padding: 14px 0 10px;
+    gap: 8px;
+  }
+  .masthead-title {
+    grid-column: 1 / -1;
+    order: -1;
+    font-size: 26px;
+    white-space: normal;
+  }
+  .masthead-right { align-items: flex-end; }
+  .clock { font-size: 18px; }
+  .grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -518,10 +540,7 @@ body::before {
 
       <!-- NOTES -->
       <div class="section">
-        <div class="section-head">
-          Notities
-          <button class="btn-small" onclick="exportToReminders()">→ Reminders</button>
-        </div>
+        <div class="section-head">Notities</div>
         <textarea class="notes-area" id="notes" placeholder="Gedachten, to-do's, intentie voor vandaag…" oninput="saveNotes()"></textarea>
         <div class="notes-saved" id="notes-saved"></div>
       </div>
@@ -569,18 +588,6 @@ body::before {
         <div id="weather-detail"><div class="skel"></div><div class="skel" style="width:70%"></div></div>
       </div>
 
-      <!-- PARCEL RSS -->
-      <div class="section">
-        <div class="section-head">Parcel feed</div>
-        <div id="parcel-list"><div class="skel"></div></div>
-        <div style="margin-top:8px">
-          <input id="parcel-url" type="text" placeholder="Parcel RSS feed URL…"
-            style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:10px;background:var(--surface);color:var(--text);outline:none"
-            value="">
-          <button class="btn-small primary" style="margin-top:6px;width:100%" onclick="loadParcel()">Feed laden</button>
-        </div>
-      </div>
-
     </div>
 
   </div><!-- /grid -->
@@ -610,7 +617,7 @@ function initGoogleAuth() {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main-page').style.display = 'block';
     document.getElementById('config-banner').classList.add('show');
-    loadWeather(); loadHuckleberry(); loadNotes(); loadParcelFromStorage(); loadFeeeedFeeds();
+    loadWeather(); loadHuckleberry(); loadNotes(); loadFeeeedFeeds();
     startClock();
     return;
   }
@@ -665,7 +672,6 @@ function onAuthenticated(user) {
   loadMail();
   loadHuckleberry();
   loadNotes();
-  loadParcelFromStorage();
   loadFeeeedFeeds();
 }
 
@@ -926,56 +932,6 @@ async function loadHuckleberry() {
 }
 
 // ══════════════════════════════════════════════════════
-//  PARCEL RSS
-// ══════════════════════════════════════════════════════
-function loadParcelFromStorage() {
-  const saved = localStorage.getItem('parcel-rss-url');
-  if (saved) {
-    document.getElementById('parcel-url').value = saved;
-    loadParcel(saved);
-  } else {
-    document.getElementById('parcel-list').innerHTML = '<div class="empty">Voer je Parcel RSS URL in</div>';
-  }
-}
-
-async function loadParcel(url) {
-  const inputUrl = url || document.getElementById('parcel-url').value.trim();
-  if (!inputUrl) return;
-  localStorage.setItem('parcel-rss-url', inputUrl);
-
-  const el = document.getElementById('parcel-list');
-  el.innerHTML = '<div class="skel"></div>';
-
-  try {
-    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(inputUrl)}`;
-    const resp = await fetch(proxy);
-    const json = await resp.json();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(json.contents, 'text/xml');
-    const items = [...xml.querySelectorAll('item')].slice(0,5);
-
-    if (!items.length) { el.innerHTML = '<div class="empty">Geen pakketten</div>'; return; }
-
-    el.innerHTML = items.map(item => {
-      const title = item.querySelector('title')?.textContent || '';
-      const desc = item.querySelector('description')?.textContent?.replace(/<[^>]*>/g,'').trim() || '';
-      const link = item.querySelector('link')?.textContent || '#';
-      return `<a href="${link}" target="_blank" style="text-decoration:none;color:inherit">
-        <div class="pkg-item">
-          <div class="pkg-icon">📦</div>
-          <div class="pkg-body">
-            <div class="pkg-sender">${title}</div>
-            <div class="pkg-status">${desc.slice(0,60)}</div>
-          </div>
-        </div>
-      </a>`;
-    }).join('');
-  } catch(e) {
-    el.innerHTML = `<div class="empty">Fout bij laden: ${e.message}</div>`;
-  }
-}
-
-// ══════════════════════════════════════════════════════
 //  FEEEED — OPML import + RSS display
 // ══════════════════════════════════════════════════════
 function importOPML(event) {
@@ -1040,40 +996,6 @@ async function loadFeeeedFeeds() {
       </div>
     </a>
   `).join('');
-}
-
-// ══════════════════════════════════════════════════════
-//  REMINDERS EXPORT (.ics / VTODO)
-// ══════════════════════════════════════════════════════
-function exportToReminders() {
-  const text = document.getElementById('notes').value.trim();
-  if (!text) return;
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-  if (!lines.length) return;
-
-  const stamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
-  const vtodos = lines.map((line, i) => [
-    'BEGIN:VTODO',
-    `UID:dashboard-${Date.now()}-${i}@dashymcdashface`,
-    `DTSTAMP:${stamp}`,
-    `SUMMARY:${line.replace(/,/g,'\\,')}`,
-    'STATUS:NEEDS-ACTION',
-    'END:VTODO',
-  ].join('\r\n')).join('\r\n');
-
-  const ics = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Dashboard//Goedemorgen//NL',
-    vtodos,
-    'END:VCALENDAR',
-  ].join('\r\n');
-
-  const blob = new Blob([ics], { type: 'text/calendar' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'reminders.ics';
-  a.click();
 }
 
 // ══════════════════════════════════════════════════════
