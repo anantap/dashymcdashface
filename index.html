@@ -924,6 +924,19 @@ function importOPML(event) {
   event.target.value = '';
 }
 
+async function fetchFeedXml(url) {
+  // Try allorigins first (returns JSON wrapper)
+  try {
+    const resp = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(6000) });
+    const json = await resp.json();
+    if (json.contents) return json.contents;
+  } catch(e) {}
+  // Fallback: corsproxy.io (returns raw content)
+  const resp2 = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(6000) });
+  if (!resp2.ok) throw new Error('proxy failed');
+  return resp2.text();
+}
+
 async function loadFeeeedFeeds() {
   const el = document.getElementById('feeed-list');
   const stored = localStorage.getItem('feeed-opml');
@@ -934,13 +947,12 @@ async function loadFeeeedFeeds() {
   el.innerHTML = '<div class="skel"></div><div class="skel" style="width:75%"></div>';
 
   const items = [];
+  let errors = 0;
   await Promise.all(feeds.map(async feed => {
     try {
-      const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(feed.url)}`;
-      const resp = await fetch(proxy);
-      const json = await resp.json();
+      const contents = await fetchFeedXml(feed.url);
       const parser = new DOMParser();
-      const xml = parser.parseFromString(json.contents, 'text/xml');
+      const xml = parser.parseFromString(contents, 'text/xml');
       const entries = [...xml.querySelectorAll('item, entry')].slice(0, 2);
       entries.forEach(e => {
         const title = e.querySelector('title')?.textContent || '';
@@ -948,12 +960,16 @@ async function loadFeeeedFeeds() {
         const pubDate = e.querySelector('pubDate, published, updated')?.textContent || '';
         items.push({ source: feed.name, title, link, date: pubDate ? new Date(pubDate) : new Date(0) });
       });
-    } catch(e) {}
+    } catch(e) { errors++; }
   }));
 
   items.sort((a,b) => b.date - a.date);
-  if (!items.length) { el.innerHTML = '<div class="empty">Geen items geladen</div>'; return; }
+  if (!items.length) {
+    el.innerHTML = `<div class="empty">Geen items geladen${errors ? ` (${errors}/${feeds.length} feeds mislukt)` : ''}</div>`;
+    return;
+  }
 
+  const errNote = errors ? `<div class="empty" style="font-size:12px;padding:4px 0">${errors} feed${errors>1?'s':''} niet bereikbaar</div>` : '';
   el.innerHTML = items.slice(0,5).map(item => `
     <a href="${item.link}" target="_blank" style="text-decoration:none;color:inherit">
       <div class="feed-item">
@@ -962,7 +978,7 @@ async function loadFeeeedFeeds() {
         <div class="feed-meta">${item.date > new Date(0) ? timeAgo(item.date) : ''}</div>
       </div>
     </a>
-  `).join('');
+  `).join('') + errNote;
 }
 
 // ══════════════════════════════════════════════════════
