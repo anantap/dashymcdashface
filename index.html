@@ -284,6 +284,7 @@ body::before {
 .mail-action-btn.archive:hover { border-color: var(--accent2); color: var(--accent2); }
 .mail-action-btn.read:hover { border-color: var(--blue); color: var(--blue); }
 .mail-item.removing { opacity: 0; transition: opacity 0.25s; }
+.section.fading-out { opacity: 0; transition: opacity 0.4s; }
 
 
 
@@ -523,12 +524,12 @@ body::before {
   </div><!-- /grid -->
 
   <!-- INBOX -->
-  <div class="section">
+  <div class="section" id="inbox-section" style="display:none">
     <div class="section-head">
       Inbox
       <span class="section-count" id="mail-count">—</span>
     </div>
-    <div id="mail-list"><div class="skel"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:90%"></div></div>
+    <div id="mail-list"></div>
   </div>
 </div><!-- /page -->
 
@@ -743,7 +744,7 @@ async function loadMail() {
     const messages = list.messages || [];
     document.getElementById('mail-count').textContent = list.resultSizeEstimate || messages.length;
 
-    if (!messages.length) { el.innerHTML = '<div class="empty">Geen ongelezen mail</div>'; return; }
+    if (!messages.length) { return; } // section stays hidden
 
     // Fetch metadata for each (parallel, limited)
     const details = await Promise.all(
@@ -795,7 +796,8 @@ async function loadMail() {
       </div>`);
     });
 
-    el.innerHTML = mailItems.join('') || '<div class="empty">Alles gelezen</div>';
+    el.innerHTML = mailItems.join('');
+    if (mailItems.length) document.getElementById('inbox-section').style.display = '';
 
   } catch(e) {
     el.innerHTML = `<div class="empty">Fout: ${e.message}</div>`;
@@ -824,7 +826,15 @@ function removeMailItem(id) {
   const el = document.getElementById('mail-' + id);
   if (!el) return;
   el.classList.add('removing');
-  setTimeout(() => el.remove(), 260);
+  setTimeout(() => {
+    el.remove();
+    const list = document.getElementById('mail-list');
+    if (!list.querySelector('.mail-item')) {
+      const section = document.getElementById('inbox-section');
+      section.classList.add('fading-out');
+      setTimeout(() => section.style.display = 'none', 420);
+    }
+  }, 260);
 }
 
 async function archiveMail(id) {
