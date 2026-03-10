@@ -298,35 +298,6 @@ body::before {
 }
 .huck-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 
-/* ── RSS / REDDIT ── */
-.feed-item {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
-.feed-item:last-child { border-bottom: none; }
-.feed-item:hover .feed-title { color: var(--accent); }
-
-.feed-source {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin-bottom: 2px;
-}
-.feed-title {
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.35;
-  transition: color 0.1s;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.feed-meta { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
-
 /* ── NOTES ── */
 .notes-area {
   width: 100%;
@@ -545,14 +516,6 @@ body::before {
         <div id="pkg-list"><div class="skel"></div><div class="skel" style="width:75%"></div></div>
       </div>
 
-      <!-- RSS -->
-      <div class="section">
-        <div class="section-head">
-          Nieuws & feeds
-          <button class="btn-small" onclick="loadFeeds()" style="font-size:9px">↻</button>
-        </div>
-        <div id="feed-list"><div class="skel"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:60%"></div></div>
-      </div>
     </div>
 
     <!-- RIGHT COL -->
@@ -575,11 +538,6 @@ body::before {
         </div>
       </div>
 
-      <!-- REDDIT -->
-      <div class="section">
-        <div class="section-head">Reddit</div>
-        <div id="reddit-list"><div class="skel"></div><div class="skel" style="width:75%"></div></div>
-      </div>
     </div>
 
   </div><!-- /grid -->
@@ -597,14 +555,6 @@ const CONFIG = {
   // Als je extern bent: leeg laten of via ngrok/cloudflared tunnel
   HUCKLEBERRY_URL: '',
 
-  // Reddit subreddits (zonder r/)
-  SUBREDDITS: ['Netherlands', 'hardware', 'homelab'],
-
-  // RSS feeds (via allorigins CORS proxy)
-  RSS_FEEDS: [
-    { name: 'NOS', url: 'https://feeds.nos.nl/nosnieuwsalgemeen' },
-    { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
-  ],
 };
 
 // ══════════════════════════════════════════════════════
@@ -617,7 +567,7 @@ function initGoogleAuth() {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main-page').style.display = 'block';
     document.getElementById('config-banner').classList.add('show');
-    loadWeather(); loadFeeds(); loadReddit(); loadHuckleberry(); loadNotes(); loadParcelFromStorage();
+    loadWeather(); loadHuckleberry(); loadNotes(); loadParcelFromStorage();
     startClock();
     return;
   }
@@ -670,8 +620,6 @@ function onAuthenticated(user) {
   loadWeather();
   loadCalendar();
   loadMail();
-  loadFeeds();
-  loadReddit();
   loadHuckleberry();
   loadNotes();
   loadParcelFromStorage();
@@ -934,72 +882,6 @@ async function loadHuckleberry() {
 }
 
 // ══════════════════════════════════════════════════════
-//  RSS FEEDS
-// ══════════════════════════════════════════════════════
-async function loadFeeds() {
-  const el = document.getElementById('feed-list');
-  el.innerHTML = '<div class="skel"></div><div class="skel" style="width:75%"></div>';
-
-  const items = [];
-  await Promise.all(CONFIG.RSS_FEEDS.map(async feed => {
-    try {
-      const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(feed.url)}`;
-      const resp = await fetch(proxy);
-      const json = await resp.json();
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(json.contents, 'text/xml');
-      const entries = [...xml.querySelectorAll('item, entry')].slice(0, 4);
-      entries.forEach(e => {
-        const title = e.querySelector('title')?.textContent || '';
-        const link = e.querySelector('link')?.textContent || e.querySelector('link')?.getAttribute('href') || '#';
-        const pubDate = e.querySelector('pubDate, published, updated')?.textContent || '';
-        items.push({ source: feed.name, title, link, date: pubDate ? new Date(pubDate) : new Date() });
-      });
-    } catch(e) {}
-  }));
-
-  items.sort((a,b) => b.date - a.date);
-
-  if (!items.length) { el.innerHTML = '<div class="empty">Geen feeds geladen</div>'; return; }
-
-  el.innerHTML = items.slice(0,8).map(item => `
-    <a href="${item.link}" target="_blank" style="text-decoration:none;color:inherit">
-      <div class="feed-item">
-        <div class="feed-source">${item.source}</div>
-        <div class="feed-title">${item.title}</div>
-        <div class="feed-meta">${timeAgo(item.date)}</div>
-      </div>
-    </a>
-  `).join('');
-}
-
-// ══════════════════════════════════════════════════════
-//  REDDIT
-// ══════════════════════════════════════════════════════
-async function loadReddit() {
-  const el = document.getElementById('reddit-list');
-  try {
-    const sub = CONFIG.SUBREDDITS[Math.floor(Math.random() * CONFIG.SUBREDDITS.length)];
-    const resp = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=6`);
-    const data = await resp.json();
-    const posts = data.data?.children || [];
-
-    el.innerHTML = posts.map(p => {
-      const post = p.data;
-      return `<a href="https://reddit.com${post.permalink}" target="_blank" style="text-decoration:none;color:inherit">
-        <div class="feed-item">
-          <div class="feed-source">r/${post.subreddit}</div>
-          <div class="feed-title">${post.title}</div>
-          <div class="feed-meta">↑ ${post.score} · ${post.num_comments} comments</div>
-        </div>
-      </a>`;
-    }).join('');
-  } catch(e) {
-    el.innerHTML = '<div class="empty">Reddit niet bereikbaar</div>';
-  }
-}
-
-// ══════════════════════════════════════════════════════
 //  PARCEL RSS
 // ══════════════════════════════════════════════════════
 function loadParcelFromStorage() {
@@ -1087,7 +969,7 @@ window.addEventListener('load', () => {
       document.getElementById('main-page').style.display = 'block';
       document.getElementById('config-banner').classList.add('show');
       document.getElementById('config-banner').textContent = '⚠ Google Identity Services kon niet laden. Controleer je internetverbinding.';
-      loadWeather(); loadFeeds(); loadReddit(); loadNotes(); startClock();
+      loadWeather(); loadNotes(); startClock();
     }
   }, 5000);
 });
