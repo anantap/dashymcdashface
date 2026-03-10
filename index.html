@@ -282,40 +282,6 @@ body::before {
 .weather-row-label { font-size: 15px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 .weather-row-val { font-family: var(--mono); font-size: 15px; font-weight: 400; text-align: right; }
 
-/* ── ZON TIMELINE ── */
-.zon-timeline { padding: 4px 0 2px; }
-.zon-track {
-  position: relative;
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 10px 0 8px;
-}
-.zon-fill {
-  position: absolute;
-  top: 0; left: 0;
-  height: 100%;
-  background: var(--text-muted);
-  border-radius: 2px;
-  width: 0%;
-}
-.zon-marker {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--text);
-  border: 2px solid var(--surface);
-  left: 0%;
-}
-.zon-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: var(--text-muted);
-}
 
 /* ── SKELETON ── */
 .skel {
@@ -459,31 +425,6 @@ body::before {
         </div>
       </div>
 
-      <!-- Zon -->
-      <div class="section">
-        <div class="section-head">Zon</div>
-        <div class="card" id="zon-block">
-          <div class="zon-timeline">
-            <div class="zon-track">
-              <div class="zon-fill" id="zon-fill"></div>
-              <div class="zon-marker" id="zon-marker"></div>
-            </div>
-            <div class="zon-labels">
-              <span id="sunrise-val">—</span>
-              <span id="sunset-val">—</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Regen komend uur -->
-      <div class="section">
-        <div class="section-head">Regen komend uur</div>
-        <div class="card" id="precip-block">
-          <div class="card-value" id="precip-val">—</div>
-          <div class="card-sub" id="precip-sub" style="display:none;"></div>
-        </div>
-      </div>
     </div>
 
     <!-- RIGHT COL: Weather -->
@@ -559,23 +500,6 @@ function startClock() {
 }
 
 // ══════════════════════════════════════════════════════
-//  ZON TIMELINE
-// ══════════════════════════════════════════════════════
-function updateZonTimeline(riseStr, setStr) {
-  const now = new Date();
-  const toMin = s => parseInt(s.slice(0,2)) * 60 + parseInt(s.slice(3,5));
-  const riseMin = toMin(riseStr);
-  const setMin  = toMin(setStr);
-  const nowMin  = now.getHours() * 60 + now.getMinutes();
-  let pct = 0;
-  if (nowMin <= riseMin) pct = 0;
-  else if (nowMin >= setMin) pct = 100;
-  else pct = (nowMin - riseMin) / (setMin - riseMin) * 100;
-  document.getElementById('zon-fill').style.width = pct + '%';
-  document.getElementById('zon-marker').style.left = pct + '%';
-}
-
-// ══════════════════════════════════════════════════════
 //  WEATHER — Open-Meteo (no API key)
 // ══════════════════════════════════════════════════════
 const WMO_CODES = {
@@ -590,7 +514,6 @@ async function loadWeather() {
       '?latitude=52.0705&longitude=4.3007' +
       '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m' +
       '&hourly=temperature_2m,precipitation_probability,precipitation' +
-      '&daily=sunrise,sunset' +
       '&forecast_days=1&timezone=Europe/Amsterdam';
 
     const resp = await fetch(url);
@@ -598,47 +521,23 @@ async function loadWeather() {
     const c = d.current;
     const code = c.weathercode;
 
-    // Main weather
     document.getElementById('weather-temp-block').textContent = Math.round(c.temperature_2m) + '°C';
     document.getElementById('weather-condition').textContent = WMO_CODES[code] || '';
 
     const maxTemp = Math.max(...d.hourly.temperature_2m.slice(0,24));
     const minTemp = Math.min(...d.hourly.temperature_2m.slice(0,24));
-    const maxRain = Math.max(...d.hourly.precipitation_probability.slice(0,24));
+
+    const hourIdx = new Date().getHours();
+    const precip = d.hourly.precipitation || [];
+    const precipNext = (precip[hourIdx] || 0) + (precip[hourIdx + 1] || 0);
+    const precipStr = precipNext === 0 ? 'Droog' : '~' + precipNext.toFixed(1) + 'mm';
 
     document.getElementById('weather-detail').innerHTML = `
       <div class="weather-row"><span class="weather-row-label">Min / Max</span><span class="weather-row-val">${Math.round(minTemp)}° / ${Math.round(maxTemp)}°</span></div>
       <div class="weather-row"><span class="weather-row-label">Wind</span><span class="weather-row-val">${Math.round(c.windspeed_10m)} km/u</span></div>
       <div class="weather-row"><span class="weather-row-label">Luchtvochtigheid</span><span class="weather-row-val">${c.relativehumidity_2m}%</span></div>
-      <div class="weather-row"><span class="weather-row-label">Kans op regen</span><span class="weather-row-val">${maxRain}%</span></div>
+      <div class="weather-row"><span class="weather-row-label">Regen komend uur</span><span class="weather-row-val">${precipStr}</span></div>
     `;
-
-    // Sunrise / Sunset
-    if (d.daily && d.daily.sunrise && d.daily.sunset) {
-      const riseStr = d.daily.sunrise[0].slice(11,16);
-      const setStr  = d.daily.sunset[0].slice(11,16);
-      document.getElementById('sunrise-val').textContent = riseStr;
-      document.getElementById('sunset-val').textContent  = setStr;
-      updateZonTimeline(riseStr, setStr);
-    }
-
-    // Precipitation next hour
-    if (d.hourly && d.hourly.precipitation) {
-      const now = new Date();
-      const hourIdx = now.getHours();
-      const precip = d.hourly.precipitation;
-      const total = (precip[hourIdx] || 0) + (precip[hourIdx + 1] || 0);
-      const precipVal = document.getElementById('precip-val');
-      const precipSub = document.getElementById('precip-sub');
-      if (total === 0) {
-        precipVal.textContent = 'Droog';
-        precipSub.style.display = 'none';
-      } else {
-        precipVal.textContent = '~' + total.toFixed(1) + 'mm';
-        precipSub.textContent = 'verwacht dit uur';
-        precipSub.style.display = 'block';
-      }
-    }
 
   } catch(e) {
     document.getElementById('weather-detail').innerHTML = '<div style="font-size:14px;color:var(--text-dim);padding:10px 0">Weer niet beschikbaar</div>';
@@ -659,11 +558,13 @@ function loadJonaSchedule() {
     6: 'Papadag'
   };
   const today = new Date().getDay();
-  const location = schedule[today] || '—';
+  const tomorrow = (today + 1) % 7;
   const el = document.getElementById('jona-schedule');
   el.innerHTML = `
     <div class="card-label">Vandaag</div>
-    <div class="card-value">${location}</div>
+    <div class="card-value">${schedule[today]}</div>
+    <div class="card-label" style="margin-top:10px;">Morgen</div>
+    <div class="card-value" style="font-size:18px;">${schedule[tomorrow]}</div>
   `;
 }
 
