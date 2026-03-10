@@ -940,7 +940,7 @@ async function loadFeeeedFeeds() {
       const json = await resp.json();
       const parser = new DOMParser();
       const xml = parser.parseFromString(json.contents, 'text/xml');
-      const entries = [...xml.querySelectorAll('item, entry')].slice(0, 3);
+      const entries = [...xml.querySelectorAll('item, entry')].slice(0, 2);
       entries.forEach(e => {
         const title = e.querySelector('title')?.textContent || '';
         const link = e.querySelector('link')?.textContent || e.querySelector('link')?.getAttribute('href') || '#';
@@ -953,7 +953,7 @@ async function loadFeeeedFeeds() {
   items.sort((a,b) => b.date - a.date);
   if (!items.length) { el.innerHTML = '<div class="empty">Geen items geladen</div>'; return; }
 
-  el.innerHTML = items.slice(0,12).map(item => `
+  el.innerHTML = items.slice(0,5).map(item => `
     <a href="${item.link}" target="_blank" style="text-decoration:none;color:inherit">
       <div class="feed-item">
         <div class="feed-source">${item.source}</div>
