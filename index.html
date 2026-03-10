@@ -6,7 +6,6 @@
 <title>Dashy McDashface</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
   --bg: #16140f;
@@ -17,9 +16,6 @@
   --text-muted: #9a9288;
   --text-dim: #5a5650;
   --accent: #e05545;
-  --accent2: #4a9e6a;
-  --blue: #5b8def;
-  --gold: #d4a017;
   --mono: 'DM Mono', monospace;
   --r: 6px;
 }
@@ -62,46 +58,12 @@ body::before {
   margin-bottom: 20px;
 }
 
-.masthead-left {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .masthead-date {
   font-family: var(--mono);
   font-size: 14px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
-}
-
-.weather-inline {
-  font-family: var(--mono);
-  font-size: 18px;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.weather-temp { font-weight: 500; color: var(--text); }
-
-.masthead-title {
-  font-family: var(--mono);
-  font-size: 44px;
-  font-weight: 400;
-  text-align: center;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.masthead-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
 }
 
 .clock {
@@ -113,15 +75,26 @@ body::before {
   line-height: 1;
 }
 
-.masthead-auth {
-  display: none;
+/* ── ADDRESS BAR ── */
+.address-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
 }
-
-.auth-name {
+.address-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 8px 12px;
   font-family: var(--mono);
-  font-size: 14px;
-  color: var(--text-muted);
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
 }
+.address-input:focus { border-color: var(--text-muted); }
+.address-input::placeholder { color: var(--text-dim); }
 
 .btn-small {
   font-family: var(--mono);
@@ -133,12 +106,10 @@ body::before {
   color: var(--text-muted);
   padding: 3px 8px;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: var(--r);
   transition: all 0.15s;
 }
 .btn-small:hover { border-color: var(--text); color: var(--text); }
-.btn-small.primary { border-color: var(--accent); color: var(--accent); }
-.btn-small.primary:hover { background: var(--accent); color: #fff; }
 
 /* ── GRID ── */
 .grid {
@@ -173,120 +144,7 @@ body::before {
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
-
-.section-count {
-  background: var(--bg2);
-  padding: 1px 5px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
-/* ── CALENDAR ── */
-.cal-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 10px 12px;
-  margin-bottom: 8px;
-}
-.cal-item:last-child { margin-bottom: 0; }
-.cal-item.now { border-color: var(--text-muted); border-left: 2px solid var(--text-muted); }
-.cal-item.dim { opacity: 0.4; }
-
-.cal-time {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-
-.cal-body { flex: 1; min-width: 0; }
-.cal-title { font-size: 25px; font-weight: 400; line-height: 1.3; color: var(--text); }
-.cal-people { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
-
-.cal-badge {
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 2px;
-  margin-top: 4px;
-  display: inline-block;
-}
-.badge-cancel { background: #3d1515; color: var(--accent); }
-.badge-changed { background: #3d3000; color: var(--gold); }
-
-/* ── MAIL ── */
-.mail-item {
-  display: flex;
-  gap: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: border-color 0.15s;
-}
-.mail-item:last-child { margin-bottom: 0; }
-.mail-item:hover { border-color: var(--text-muted); }
-
-.mail-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  margin-top: 5px;
-  flex-shrink: 0;
-}
-.dot-unread { background: var(--accent); }
-.dot-calendar { background: var(--blue); }
-
-.mail-body { flex: 1; min-width: 0; }
-.mail-from { font-weight: 400; font-size: 14px; color: var(--text-muted); }
-.mail-subject { font-size: 16px; color: var(--text); line-height: 1.3; margin-top: 2px; }
-.mail-tag {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 12px;
-  padding: 1px 5px;
-  border-radius: 2px;
-  margin-top: 3px;
-}
-.tag-calendar { background: #1a2d5a; color: var(--blue); }
-.tag-action { background: #3d2500; color: #f07030; }
-
-.mail-time { font-family: var(--mono); font-size: 14px; color: var(--text-dim); white-space: nowrap; }
-
-.mail-actions {
-  display: flex;
-  gap: 4px;
-  margin-top: 6px;
-}
-.mail-action-btn {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  padding: 2px 7px;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.mail-action-btn:hover { border-color: var(--text-muted); color: var(--text); }
-.mail-action-btn.archive:hover { border-color: var(--accent2); color: var(--accent2); }
-.mail-action-btn.read:hover { border-color: var(--blue); color: var(--blue); }
-.mail-item.removing { opacity: 0; transition: opacity 0.25s; }
-.section.fading-out { opacity: 0; transition: opacity 0.4s; }
-
-
 
 /* ── WEATHER ── */
 .weather-block {
@@ -332,27 +190,6 @@ body::before {
 .weather-row-label { font-size: 15px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 .weather-row-val { font-family: var(--mono); font-size: 15px; font-weight: 400; text-align: right; }
 
-/* ── ADDRESS BAR ── */
-.address-bar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-.address-input {
-  flex: 1;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 8px 12px;
-  font-family: var(--mono);
-  font-size: 15px;
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.15s;
-}
-.address-input:focus { border-color: var(--text-muted); }
-.address-input::placeholder { color: var(--text-dim); }
-
 /* ── SKELETON ── */
 .skel {
   background: linear-gradient(90deg, var(--border) 25%, var(--bg2) 50%, var(--border) 75%);
@@ -363,47 +200,6 @@ body::before {
   margin: 7px 0;
 }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-/* ── EMPTY ── */
-.empty { font-family: var(--mono); font-size: 14px; color: var(--text-dim); padding: 10px 0; }
-
-/* ── AUTH SCREEN ── */
-.auth-screen {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-}
-.auth-card {
-  text-align: center;
-  max-width: 320px;
-}
-.auth-card-title {
-  font-family: var(--mono);
-  font-size: 50px;
-  font-weight: 400;
-  margin-bottom: 6px;
-}
-.auth-card-sub {
-  font-size: 18px;
-  color: var(--text-muted);
-  margin-bottom: 28px;
-  line-height: 1.6;
-}
-.auth-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 20px 0;
-}
-.auth-note {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text-dim);
-  line-height: 1.7;
-}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 5px; }
@@ -417,65 +213,11 @@ body::before {
 .section { animation: fadeIn 0.5s ease forwards; opacity: 0; }
 .section:nth-child(1) { animation-delay: 0.05s; }
 .section:nth-child(2) { animation-delay: 0.1s; }
-.section:nth-child(3) { animation-delay: 0.15s; }
-.section:nth-child(4) { animation-delay: 0.2s; }
-
-/* ── CONFIG BANNER ── */
-.config-banner {
-  background: #2d2500;
-  border: 1px solid #5a4a00;
-  border-radius: var(--r);
-  padding: 8px 12px;
-  font-family: var(--mono);
-  font-size: 14px;
-  color: #d4a017;
-  margin-bottom: 16px;
-  display: none;
-}
-.btn-google {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 19px;
-  font-weight: 500;
-  padding: 10px 24px;
-  border-radius: var(--r);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  width: 240px;
-  justify-content: center;
-}
-.btn-google:hover { border-color: var(--text-muted); background: var(--bg2); }
-.btn-google::before {
-  content: '';
-  width: 18px;
-  height: 18px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%234285F4' d='M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z'/%3E%3Cpath fill='%2334A853' d='M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z'/%3E%3Cpath fill='%23FBBC05' d='M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z'/%3E%3Cpath fill='%23EA4335' d='M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z'/%3E%3C/svg%3E") no-repeat center;
-  background-size: contain;
-  flex-shrink: 0;
-}
-
-.config-banner.show { display: block; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
   .page { padding: 0 16px 32px; }
-  .masthead {
-    grid-template-columns: 1fr 1fr;
-    padding: 14px 0 10px;
-    gap: 8px;
-  }
-  .masthead-title {
-    grid-column: 1 / -1;
-    order: -1;
-    font-size: 36px;
-    white-space: normal;
-  }
-  .masthead-right { align-items: flex-end; }
+  .masthead { padding: 14px 0 10px; }
   .clock { font-size: 25px; }
   .grid { grid-template-columns: 1fr; }
 }
@@ -483,53 +225,24 @@ body::before {
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
-<div id="auth-screen" class="auth-screen" style="display:none">
-  <div class="auth-card">
-    <div class="auth-card-title">Goedemorgen</div>
-    <div class="auth-card-sub">Log in met je Google-account om je dashboard te laden.</div>
-    <button class="btn-google" id="g-signin-btn" onclick="signInWithGoogle()">Inloggen met Google</button>
-    <hr class="auth-divider">
-    <div class="auth-note">
-      Gebruikt Google Calendar & Gmail API.<br>
-      Alles blijft in je browser — niets wordt opgeslagen.
-    </div>
-  </div>
-</div>
-
-<div class="page" id="main-page" style="display:none">
-
-  <div id="config-banner" class="config-banner">
-    ⚙ Vervang <code>YOUR_GOOGLE_CLIENT_ID</code> bovenaan de HTML met jouw OAuth Client ID om in te kunnen loggen.
-  </div>
+<div class="page">
 
   <!-- MASTHEAD -->
   <div class="masthead fade-in">
-    <div class="masthead-left">
-      <div class="masthead-date" id="date-str"></div>
-    </div>
-    <div class="masthead-right">
-      <div class="clock" id="clock"></div>
-    </div>
+    <div class="masthead-date" id="date-str"></div>
+    <div class="clock" id="clock"></div>
   </div>
 
   <!-- ADDRESS BAR -->
   <div class="address-bar">
     <input class="address-input" id="address-input" type="text" placeholder="Typ een adres…" onkeydown="if(event.key==='Enter') navigate()">
-    <button class="btn-small" onclick="navigate()" style="border-radius: var(--r)">Go!</button>
+    <button class="btn-small" onclick="navigate()">Go!</button>
   </div>
 
   <div class="grid">
 
-    <!-- LEFT COL: Calendar + Jona -->
+    <!-- LEFT COL: Jona -->
     <div>
-      <!-- AGENDA -->
-      <div class="section">
-        <div class="section-head">Agenda vandaag</div>
-        <div id="cal-list"><div class="skel"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:65%"></div></div>
-      </div>
-
-      <!-- JONA -->
       <div class="section">
         <div class="section-head">Jona</div>
         <div id="jona-schedule" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px;">
@@ -541,7 +254,6 @@ body::before {
 
     <!-- RIGHT COL: Weather -->
     <div class="col-right">
-      <!-- WEATHER -->
       <div class="section">
         <div class="section-head">Weer</div>
         <div class="weather-block">
@@ -553,133 +265,13 @@ body::before {
           <div id="weather-detail"><div class="skel"></div><div class="skel" style="width:70%"></div></div>
         </div>
       </div>
-
     </div>
 
   </div><!-- /grid -->
 
-  <!-- INBOX -->
-  <div class="section" id="inbox-section" style="display:none">
-    <div class="section-head">
-      Inbox
-      <span class="section-count" id="mail-count">—</span>
-    </div>
-    <div id="mail-list"></div>
-  </div>
 </div><!-- /page -->
 
 <script>
-// ══════════════════════════════════════════════════════
-//  CONFIG — vervang dit met jouw eigen waarden
-// ══════════════════════════════════════════════════════
-const CONFIG = {
-  GOOGLE_CLIENT_ID: '820314194609-k003tj0bs939icr9jp8tvkirbhl6u267.apps.googleusercontent.com',
-
-
-};
-
-// ══════════════════════════════════════════════════════
-//  GOOGLE OAUTH
-// ══════════════════════════════════════════════════════
-let googleAccessToken = null;
-let tokenClient;
-let dashboardLoaded = false;
-let tokenRefreshPromise = null;
-let tokenRefreshResolve = null;
-
-function initGoogleAuth() {
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CONFIG.GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.modify',
-    callback: (resp) => {
-      if (resp.access_token) {
-        googleAccessToken = resp.access_token;
-        const expiry = Date.now() + (resp.expires_in || 3600) * 1000;
-        localStorage.setItem('goog-token', resp.access_token);
-        localStorage.setItem('goog-token-expiry', String(expiry));
-        if (tokenRefreshResolve) {
-          tokenRefreshResolve(resp.access_token);
-          tokenRefreshResolve = null;
-        }
-        if (!dashboardLoaded) onAuthenticated();
-      }
-    }
-  });
-
-  // Use cached token if still valid (>1 min remaining)
-  const savedToken = localStorage.getItem('goog-token');
-  const savedExpiry = parseInt(localStorage.getItem('goog-token-expiry') || '0');
-  if (savedToken && savedExpiry > Date.now() + 60000) {
-    googleAccessToken = savedToken;
-    onAuthenticated();
-    return;
-  }
-
-  // Try silent re-auth first; only show login screen if it fails after 10s
-  tokenClient.requestAccessToken({ prompt: '' });
-  setTimeout(() => {
-    if (!dashboardLoaded) document.getElementById('auth-screen').style.display = 'flex';
-  }, 10000);
-}
-
-// Called before every API request — refreshes silently if token is expired or close to it
-function ensureValidToken() {
-  const expiry = parseInt(localStorage.getItem('goog-token-expiry') || '0');
-  if (googleAccessToken && expiry > Date.now() + 60000) {
-    return Promise.resolve(googleAccessToken);
-  }
-  if (tokenRefreshPromise) return tokenRefreshPromise;
-  tokenRefreshPromise = new Promise(resolve => {
-    tokenRefreshResolve = token => {
-      tokenRefreshPromise = null;
-      resolve(token);
-    };
-    tokenClient.requestAccessToken({ prompt: '' });
-  });
-  return tokenRefreshPromise;
-}
-
-function signInWithGoogle() {
-  tokenClient.requestAccessToken({ prompt: 'consent' });
-}
-
-function onAuthenticated() {
-  dashboardLoaded = true;
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('main-page').style.display = 'block';
-  document.getElementById('address-input').focus();
-  startClock();
-  loadWeather();
-  loadCalendar();
-  loadMail();
-  loadJonaSchedule();
-}
-
-function signOut() {
-  googleAccessToken = null;
-  localStorage.removeItem('goog-token');
-  localStorage.removeItem('goog-token-expiry');
-  location.reload();
-}
-
-async function gapi(path) {
-  const token = await ensureValidToken();
-  const resp = await fetch('https://www.googleapis.com/gmail/v1' + path, {
-    headers: { Authorization: 'Bearer ' + token }
-  });
-  if (!resp.ok) throw new Error(resp.status);
-  return resp.json();
-}
-
-async function gcal(path) {
-  const token = await ensureValidToken();
-  const resp = await fetch('https://www.googleapis.com/calendar/v3' + path, {
-    headers: { Authorization: 'Bearer ' + token }
-  });
-  if (!resp.ok) throw new Error(resp.status);
-  return resp.json();
-}
-
 // ══════════════════════════════════════════════════════
 //  ADDRESS BAR
 // ══════════════════════════════════════════════════════
@@ -716,14 +308,9 @@ const WMO_CODES = {
   45:'Mist',48:'Rijpmist',51:'Lichte motregen',53:'Motregen',55:'Zware motregen',
   61:'Lichte regen',63:'Regen',65:'Zware regen',71:'Lichte sneeuw',73:'Sneeuw',80:'Regenbuien',81:'Buien',95:'Onweer'
 };
-const WMO_ICON = {
-  0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌧',55:'🌧',
-  61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'❄️',80:'🌦',81:'🌧',95:'⛈'
-};
 
 async function loadWeather() {
   try {
-    // Den Haag coordinates
     const resp = await fetch('https://api.open-meteo.com/v1/forecast?latitude=52.0705&longitude=4.3007&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m&hourly=temperature_2m,precipitation_probability&forecast_days=1&timezone=Europe/Amsterdam');
     const d = await resp.json();
     const c = d.current;
@@ -743,211 +330,23 @@ async function loadWeather() {
       <div class="weather-row"><span class="weather-row-label">Kans op regen</span><span class="weather-row-val">${maxRain}%</span></div>
     `;
   } catch(e) {
-    document.getElementById('weather-detail').innerHTML = '<div class="empty">Weer niet beschikbaar</div>';
+    document.getElementById('weather-detail').innerHTML = '<div style="font-size:14px;color:var(--text-dim);padding:10px 0">Weer niet beschikbaar</div>';
   }
 }
-
-// ══════════════════════════════════════════════════════
-//  GOOGLE CALENDAR
-// ══════════════════════════════════════════════════════
-async function loadCalendar() {
-  const el = document.getElementById('cal-list');
-  try {
-    const today = new Date();
-    const start = new Date(today); start.setHours(0,0,0,0);
-    const end = new Date(today); end.setHours(23,59,59,999);
-
-    const data = await gcal(`/calendars/primary/events?timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=15`);
-    const events = data.items || [];
-
-    if (!events.length) { el.innerHTML = '<div class="empty">Geen afspraken vandaag</div>'; return; }
-
-    const now = new Date();
-    const fmt = d => d.toLocaleTimeString('nl', {hour:'2-digit',minute:'2-digit'});
-
-    const parsed = events
-      .map(ev => {
-        const s = ev.start.dateTime ? new Date(ev.start.dateTime) : null;
-        const e = ev.end.dateTime ? new Date(ev.end.dateTime) : null;
-        const isNow = s && e && now >= s && now <= e;
-        return { ev, s, e, isNow };
-      })
-      .filter(({ ev, e }) => !ev.end.dateTime || e > now); // hide past events
-
-    const anyNow = parsed.some(p => p.isNow);
-
-    el.innerHTML = parsed.map(({ ev, s, e, isNow }) => {
-      const allDay = !ev.start.dateTime;
-      const isCancelled = ev.status === 'cancelled';
-      const attendees = (ev.attendees||[]).map(a => a.displayName || a.email.split('@')[0]).slice(0,3).join(', ');
-      const dim = anyNow && !isNow;
-
-      let badge = '';
-      if (isCancelled) badge = '<span class="cal-badge badge-cancel">geannuleerd</span>';
-
-      return `<div class="cal-item${isNow ? ' now' : ''}${dim ? ' dim' : ''}">
-        <div class="cal-time">${allDay ? 'Hele dag' : s ? (e ? `${fmt(s)} – ${fmt(e)}` : fmt(s)) : '—'}</div>
-        <div class="cal-body">
-          <div class="cal-title">${ev.summary || '(geen titel)'}</div>
-          ${attendees ? `<div class="cal-people">${attendees}</div>` : ''}
-          ${badge}
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    el.innerHTML = `<div class="empty">Fout: ${e.message}</div>`;
-  }
-}
-
-// ══════════════════════════════════════════════════════
-//  GMAIL
-// ══════════════════════════════════════════════════════
-const CALENDAR_SUBJECTS = ['uitnodiging','invitation','accepted','declined','geaccepteerd','geweigerd','bijgewerkt','updated','cancelled','geannuleerd'];
-
-function timeAgo(dateMs) {
-  const diff = Date.now() - dateMs;
-  const m = Math.floor(diff/60000);
-  const h = Math.floor(diff/3600000);
-  const d = Math.floor(diff/86400000);
-  if (m < 60) return `${m}m`;
-  if (h < 24) return `${h}u`;
-  return `${d}d`;
-}
-
-async function loadMail() {
-  const el = document.getElementById('mail-list');
-  try {
-    // Get unread messages
-    const list = await gapi('/users/me/messages?q=is:unread in:inbox&maxResults=20');
-    const messages = list.messages || [];
-    document.getElementById('mail-count').textContent = list.resultSizeEstimate || messages.length;
-
-    if (!messages.length) { return; } // section stays hidden
-
-    // Fetch metadata for each (parallel, limited)
-    const details = await Promise.all(
-      messages.slice(0,15).map(m =>
-        gapi(`/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`)
-          .catch(() => null)
-      )
-    );
-
-    const mailItems = [];
-
-    details.filter(Boolean).forEach(msg => {
-      const headers = msg.payload?.headers || [];
-      const get = name => headers.find(h=>h.name===name)?.value || '';
-      const from = get('From');
-      const subject = get('Subject');
-      const date = new Date(parseInt(msg.internalDate));
-
-      const fromLower = from.toLowerCase();
-      const subLower = subject.toLowerCase();
-
-      // Classify
-      const isCal = CALENDAR_SUBJECTS.some(s => subLower.startsWith(s));
-      const isAction = /actie|feedback|review|kun jij|kan jij|could you|please|verzoek/i.test(subject + ' ' + from);
-
-      const fromName = from.replace(/<.*>/,'').trim().replace(/"/g,'') || from.split('@')[0];
-
-      let tag = '';
-      if (isCal) tag = '<span class="mail-tag tag-calendar">📅 agenda</span>';
-      else if (isAction) tag = '<span class="mail-tag tag-action">⚡ actie</span>';
-
-      const dotClass = isCal ? 'dot-calendar' : 'dot-unread';
-
-      const safeFrom = fromName.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      const safeSub = subject.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-      mailItems.push(`<div class="mail-item" id="mail-${msg.id}">
-        <div class="mail-dot ${dotClass}"></div>
-        <div class="mail-body">
-          <div class="mail-from">${safeFrom}</div>
-          <div class="mail-subject">${safeSub}</div>
-          ${tag}
-          <div class="mail-actions">
-            <button class="mail-action-btn archive" onclick="archiveMail('${msg.id}')">Archiveer</button>
-            <button class="mail-action-btn read" onclick="markAsRead('${msg.id}')">Gelezen</button>
-          </div>
-        </div>
-        <div class="mail-time">${timeAgo(date)}</div>
-      </div>`);
-    });
-
-    el.innerHTML = mailItems.join('');
-    if (mailItems.length) document.getElementById('inbox-section').style.display = '';
-
-  } catch(e) {
-    el.innerHTML = `<div class="empty">Fout: ${e.message}</div>`;
-  }
-}
-
-async function gapiPost(path, body) {
-  const token = await ensureValidToken();
-  const resp = await fetch('https://www.googleapis.com/gmail/v1' + path, {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if (resp.status === 403 || resp.status === 401) {
-    googleAccessToken = null;
-    localStorage.removeItem('goog-token');
-    localStorage.removeItem('goog-token-expiry');
-    tokenClient.requestAccessToken({ prompt: '' });
-    throw new Error('Opnieuw inloggen vereist voor deze actie.');
-  }
-  if (!resp.ok) throw new Error(resp.status);
-  return resp.json();
-}
-
-function removeMailItem(id) {
-  const el = document.getElementById('mail-' + id);
-  if (!el) return;
-  el.classList.add('removing');
-  setTimeout(() => {
-    el.remove();
-    const list = document.getElementById('mail-list');
-    if (!list.querySelector('.mail-item')) {
-      const section = document.getElementById('inbox-section');
-      section.style.animation = 'none';
-      section.style.transition = 'opacity 0.4s';
-      section.offsetHeight; // force reflow so transition fires
-      section.style.opacity = '0';
-      setTimeout(() => section.style.display = 'none', 420);
-    }
-  }, 260);
-}
-
-async function archiveMail(id) {
-  try {
-    await gapiPost(`/users/me/messages/${id}/modify`, { removeLabelIds: ['INBOX'] });
-    removeMailItem(id);
-  } catch(e) { alert('Archiveren mislukt: ' + e.message); }
-}
-
-async function markAsRead(id) {
-  try {
-    await gapiPost(`/users/me/messages/${id}/modify`, { removeLabelIds: ['UNREAD'] });
-    removeMailItem(id);
-  } catch(e) { alert('Markeren mislukt: ' + e.message); }
-}
-
-
 
 // ══════════════════════════════════════════════════════
 //  JONA SCHEDULE
 // ══════════════════════════════════════════════════════
 function loadJonaSchedule() {
   const schedule = {
-    0: 'Papadag',      // Sunday (not in schedule, but default)
-    1: 'Papadag',      // Monday
-    2: 'Opa & Omadag', // Tuesday
-    3: 'Mamadag',      // Wednesday
-    4: 'Crèche',        // Thursday
-    5: 'Crèche',        // Friday
-    6: 'Papadag'       // Saturday (not in schedule, but default)
+    0: 'Papadag',
+    1: 'Papadag',
+    2: 'Opa & Omadag',
+    3: 'Mamadag',
+    4: 'Crèche',
+    5: 'Crèche',
+    6: 'Papadag'
   };
-  
   const today = new Date().getDay();
   const location = schedule[today] || '—';
   const el = document.getElementById('jona-schedule');
@@ -961,24 +360,10 @@ function loadJonaSchedule() {
 //  BOOT
 // ══════════════════════════════════════════════════════
 window.addEventListener('load', () => {
-  // Wait for Google Identity Services to load
-  const interval = setInterval(() => {
-    if (window.google?.accounts) {
-      clearInterval(interval);
-      initGoogleAuth();
-    }
-  }, 100);
-  // Fallback if GSI doesn't load (no internet, etc.)
-  setTimeout(() => {
-    clearInterval(interval);
-    if (!window.google) {
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('main-page').style.display = 'block';
-      document.getElementById('config-banner').classList.add('show');
-      document.getElementById('config-banner').textContent = '⚠ Google Identity Services kon niet laden. Controleer je internetverbinding.';
-      loadWeather(); loadJonaSchedule(); startClock();
-    }
-  }, 5000);
+  startClock();
+  loadWeather();
+  loadJonaSchedule();
+  document.getElementById('address-input').focus();
 });
 </script>
 </body>
