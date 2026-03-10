@@ -565,7 +565,7 @@ body::before {
         <div id="mail-list"><div class="skel"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:90%"></div></div>
       </div>
 
-      <!-- FEEEED
+      <!-- FEEEED FEEDS -->
       <div class="section">
         <div class="section-head">
           Feeds
@@ -622,12 +622,24 @@ function initGoogleAuth() {
     return;
   }
 
+  // Restore saved token if still valid (>1 min remaining)
+  const savedToken = localStorage.getItem('goog-token');
+  const savedExpiry = parseInt(localStorage.getItem('goog-token-expiry') || '0');
+  if (savedToken && savedExpiry > Date.now() + 60000) {
+    googleAccessToken = savedToken;
+    onAuthenticated();
+    return;
+  }
+
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.GOOGLE_CLIENT_ID,
     scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.readonly',
     callback: (resp) => {
       if (resp.access_token) {
         googleAccessToken = resp.access_token;
+        const expiry = Date.now() + (resp.expires_in || 3600) * 1000;
+        localStorage.setItem('goog-token', resp.access_token);
+        localStorage.setItem('goog-token-expiry', String(expiry));
         onAuthenticated();
       }
     }
@@ -654,7 +666,8 @@ function onAuthenticated() {
 
 function signOut() {
   googleAccessToken = null;
-  google.accounts.id.disableAutoSelect();
+  localStorage.removeItem('goog-token');
+  localStorage.removeItem('goog-token-expiry');
   location.reload();
 }
 
