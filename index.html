@@ -177,18 +177,18 @@ body::before {
   margin-bottom: 20px;
 }
 
-.col-right {
+.col-left, .col-right {
   display: flex;
   flex-direction: column;
 }
 
-.col-right .section {
+.col-left .section, .col-right .section {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.col-right .weather-block {
+.col-left #jona-schedule, .col-right .weather-block {
   flex: 1;
 }
 
@@ -415,7 +415,7 @@ body::before {
   <div class="grid">
 
     <!-- LEFT COL -->
-    <div>
+    <div class="col-left">
       <!-- Jona -->
       <div class="section">
         <div class="section-head">Jona</div>
@@ -564,7 +564,7 @@ function loadJonaSchedule() {
     <div class="card-label">Vandaag</div>
     <div class="card-value">${schedule[today]}</div>
     <div class="card-label" style="margin-top:10px;">Morgen</div>
-    <div class="card-value" style="font-size:18px;">${schedule[tomorrow]}</div>
+    <div class="card-value">${schedule[tomorrow]}</div>
   `;
 }
 
