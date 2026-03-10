@@ -615,11 +615,11 @@ function initGoogleAuth() {
     return;
   }
 
-  // Try silent re-auth first; only show login screen if it fails
+  // Try silent re-auth first; only show login screen if it fails after 10s
   tokenClient.requestAccessToken({ prompt: '' });
   setTimeout(() => {
     if (!dashboardLoaded) document.getElementById('auth-screen').style.display = 'flex';
-  }, 3000);
+  }, 10000);
 }
 
 // Called before every API request — refreshes silently if token is expired or close to it
@@ -890,11 +890,10 @@ async function gapiPost(path, body) {
     body: JSON.stringify(body)
   });
   if (resp.status === 403 || resp.status === 401) {
-    // Token lacks required scope — clear it and re-authenticate
+    googleAccessToken = null;
     localStorage.removeItem('goog-token');
     localStorage.removeItem('goog-token-expiry');
-    googleAccessToken = null;
-    tokenClient.requestAccessToken();
+    tokenClient.requestAccessToken({ prompt: '' });
     throw new Error('Opnieuw inloggen vereist voor deze actie.');
   }
   if (!resp.ok) throw new Error(resp.status);
