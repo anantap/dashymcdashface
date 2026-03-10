@@ -338,13 +338,14 @@ body::before {
 .weather-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+  gap: 12px;
   padding: 5px 0;
   border-bottom: 1px solid var(--border);
 }
 .weather-row:last-child { border-bottom: none; }
-.weather-row-label { font-size: 15px; color: var(--text-muted); }
-.weather-row-val { font-family: var(--mono); font-size: 15px; font-weight: 400; }
+.weather-row-label { font-size: 15px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+.weather-row-val { font-family: var(--mono); font-size: 15px; font-weight: 400; text-align: right; }
 
 /* ── SKELETON ── */
 .skel {
