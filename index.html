@@ -279,34 +279,6 @@ body::before {
 }
 .huck-sub { font-size: 14px; color: var(--text-muted); margin-top: 2px; }
 
-/* ── RSS / FEEDS ── */
-.feed-item {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
-.feed-item:last-child { border-bottom: none; }
-.feed-item:hover .feed-title { color: var(--accent); }
-.feed-source {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin-bottom: 2px;
-}
-.feed-title {
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.35;
-  transition: color 0.1s;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.feed-meta { font-family: var(--mono); font-size: 14px; color: var(--text-dim); margin-top: 2px; }
-
 /* ── NOTES ── */
 .notes-area {
   width: 100%;
@@ -566,18 +538,6 @@ body::before {
         <div id="mail-list"><div class="skel"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:90%"></div></div>
       </div>
 
-      <!-- FEEEED FEEDS -->
-      <div class="section">
-        <div class="section-head">
-          Feeds
-          <span style="display:flex;gap:6px;align-items:center">
-            <button class="btn-small" onclick="loadFeeeedFeeds()" style="font-size:12px">↻</button>
-            <label class="btn-small" style="cursor:pointer">OPML importeren<input type="file" accept=".opml,text/xml,application/xml" onchange="importOPML(event)" style="display:none"></label>
-          </span>
-        </div>
-        <div id="feeed-list"><div class="empty">Importeer je feeeed OPML om feeds te laden</div></div>
-      </div>
-
     </div>
 
     <!-- RIGHT COL -->
@@ -618,7 +578,7 @@ function initGoogleAuth() {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main-page').style.display = 'block';
     document.getElementById('config-banner').classList.add('show');
-    loadWeather(); loadHuckleberry(); loadNotes(); loadFeeeedFeeds();
+    loadWeather(); loadHuckleberry(); loadNotes();
     startClock();
     return;
   }
@@ -662,7 +622,6 @@ function onAuthenticated() {
   loadMail();
   loadHuckleberry();
   loadNotes();
-  loadFeeeedFeeds();
 }
 
 function signOut() {
@@ -898,88 +857,6 @@ async function loadHuckleberry() {
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  FEEEED — OPML import + RSS display
-// ══════════════════════════════════════════════════════
-function importOPML(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(e.target.result, 'text/xml');
-      const outlines = [...xml.querySelectorAll('outline[xmlUrl], outline[xmlurl]')];
-      const feeds = outlines.map(o => ({
-        name: o.getAttribute('title') || o.getAttribute('text') || 'Feed',
-        url: o.getAttribute('xmlUrl') || o.getAttribute('xmlurl'),
-      })).filter(f => f.url);
-      localStorage.setItem('feeed-opml', JSON.stringify(feeds));
-      loadFeeeedFeeds();
-    } catch(err) {
-      document.getElementById('feeed-list').innerHTML = '<div class="empty">OPML kon niet worden gelezen</div>';
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-
-async function fetchFeedXml(url) {
-  // Try allorigins first (returns JSON wrapper)
-  try {
-    const resp = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(6000) });
-    const json = await resp.json();
-    if (json.contents) return json.contents;
-  } catch(e) {}
-  // Fallback: corsproxy.io (returns raw content)
-  const resp2 = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(6000) });
-  if (!resp2.ok) throw new Error('proxy failed');
-  return resp2.text();
-}
-
-async function loadFeeeedFeeds() {
-  const el = document.getElementById('feeed-list');
-  const stored = localStorage.getItem('feeed-opml');
-  if (!stored) return;
-  const feeds = JSON.parse(stored);
-  if (!feeds.length) { el.innerHTML = '<div class="empty">Geen feeds in OPML</div>'; return; }
-
-  el.innerHTML = '<div class="skel"></div><div class="skel" style="width:75%"></div>';
-
-  const items = [];
-  let errors = 0;
-  await Promise.all(feeds.map(async feed => {
-    try {
-      const contents = await fetchFeedXml(feed.url);
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(contents, 'text/xml');
-      const entries = [...xml.querySelectorAll('item, entry')].slice(0, 2);
-      entries.forEach(e => {
-        const title = e.querySelector('title')?.textContent || '';
-        const link = e.querySelector('link')?.textContent || e.querySelector('link')?.getAttribute('href') || '#';
-        const pubDate = e.querySelector('pubDate, published, updated')?.textContent || '';
-        items.push({ source: feed.name, title, link, date: pubDate ? new Date(pubDate) : new Date(0) });
-      });
-    } catch(e) { errors++; }
-  }));
-
-  items.sort((a,b) => b.date - a.date);
-  if (!items.length) {
-    el.innerHTML = `<div class="empty">Geen items geladen${errors ? ` (${errors}/${feeds.length} feeds mislukt)` : ''}</div>`;
-    return;
-  }
-
-  const errNote = errors ? `<div class="empty" style="font-size:12px;padding:4px 0">${errors} feed${errors>1?'s':''} niet bereikbaar</div>` : '';
-  el.innerHTML = items.slice(0,5).map(item => `
-    <a href="${item.link}" target="_blank" style="text-decoration:none;color:inherit">
-      <div class="feed-item">
-        <div class="feed-source">${item.source}</div>
-        <div class="feed-title">${item.title}</div>
-        <div class="feed-meta">${item.date > new Date(0) ? timeAgo(item.date) : ''}</div>
-      </div>
-    </a>
-  `).join('') + errNote;
-}
 
 // ══════════════════════════════════════════════════════
 //  NOTES (localStorage)
@@ -1019,7 +896,7 @@ window.addEventListener('load', () => {
       document.getElementById('main-page').style.display = 'block';
       document.getElementById('config-banner').classList.add('show');
       document.getElementById('config-banner').textContent = '⚠ Google Identity Services kon niet laden. Controleer je internetverbinding.';
-      loadWeather(); loadNotes(); loadFeeeedFeeds(); startClock();
+      loadWeather(); loadNotes(); startClock();
     }
   }, 5000);
 });
