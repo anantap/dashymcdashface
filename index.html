@@ -309,31 +309,39 @@ body::before {
 .section:nth-child(3) { animation-delay: 0.15s; }
 .section:nth-child(4) { animation-delay: 0.2s; }
 
-/* ── FEED GRID ── */
-.feed-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
+/* ── CAROUSEL ── */
+.carousel-wrap {
+  overflow: hidden;
 }
-
-/* ── FEED ITEMS ── */
-.feed-source {
+.carousel-track {
+  display: flex;
+  transition: transform 0.35s ease;
+}
+.carousel-page {
+  min-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.carousel-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 12px;
+}
+.carousel-source {
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-dim);
-  margin-bottom: 2px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
-.feed-item {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-}
-.feed-item:last-child { border-bottom: none; }
-
-.feed-item a {
+.carousel-card a {
   font-family: var(--mono);
   font-size: 14px;
   color: var(--text);
@@ -341,24 +349,32 @@ body::before {
   line-height: 1.4;
   display: block;
 }
-.feed-item a:hover { color: var(--text-muted); }
-
-.feed-block {
-  margin-bottom: 16px;
-}
-
-.feed-block-head {
+.carousel-card a:hover { color: var(--text-muted); }
+.carousel-nav {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+  gap: 8px;
 }
-
+.carousel-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 1px 7px;
+  border-radius: var(--r);
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+.carousel-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
+.carousel-btn:disabled { opacity: 0.25; cursor: default; }
+.carousel-pos {
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 36px;
+  text-align: center;
+}
 .feed-delete {
   display: inline;
   background: transparent;
@@ -366,26 +382,23 @@ body::before {
   color: var(--text-dim);
   cursor: pointer;
   font-family: var(--mono);
-  font-size: 12px;
-  padding: 0 2px;
+  font-size: 11px;
+  padding: 0;
   transition: color 0.15s;
+  line-height: 1;
 }
 .feed-delete:hover { color: var(--accent); }
 
-.feed-error {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--text-dim);
-  padding: 8px 0;
-}
-
 /* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .carousel-page { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 640px) {
   .page { padding: 0 16px 32px; }
   .masthead { padding: 14px 0 10px; }
   .clock { font-size: 22px; }
   .grid { grid-template-columns: 1fr; }
-  .feed-grid { grid-template-columns: 1fr; }
+  .carousel-page { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -443,36 +456,28 @@ body::before {
 
   </div><!-- /grid -->
 
-  <!-- FEED GRID -->
-  <div class="feed-grid" id="feed-grid">
-
-    <!-- RSS Nieuws -->
-    <div>
-      <div class="section-head" style="margin-bottom:12px;">
-        Nieuws
-      </div>
-      <div id="rss-container"></div>
-      <div class="edit-form" id="rss-form">
-        <input class="edit-input" id="rss-name" placeholder="Naam" style="width:120px">
-        <input class="edit-input" id="rss-url" placeholder="Feed URL" style="width:220px">
-        <button class="btn-small" onclick="addFeed()">Voeg toe</button>
-        <label class="btn-small" style="cursor:pointer;">OPML<input type="file" accept=".opml,.xml" style="display:none" onchange="importOpml(event)"></label>
+  <!-- CAROUSEL -->
+  <div>
+    <div class="section-head" style="margin-bottom:12px;">
+      <span>Feeds</span>
+      <div class="carousel-nav">
+        <button class="carousel-btn" id="carousel-prev" onclick="carouselNav(-1)">←</button>
+        <span class="carousel-pos" id="carousel-pos"></span>
+        <button class="carousel-btn" id="carousel-next" onclick="carouselNav(1)">→</button>
       </div>
     </div>
-
-    <!-- Reddit -->
-    <div>
-      <div class="section-head" style="margin-bottom:12px;">
-        Reddit
-      </div>
-      <div id="reddit-container"></div>
-      <div class="edit-form" id="reddit-form">
-        <input class="edit-input" id="reddit-sub" placeholder="Subreddit naam" style="width:180px">
-        <button class="btn-small" onclick="addSubreddit()">Voeg toe</button>
-      </div>
+    <div class="carousel-wrap">
+      <div class="carousel-track" id="carousel-track"></div>
     </div>
-
-  </div><!-- /feed-grid -->
+    <div class="edit-form" id="rss-form" style="margin-top:12px;">
+      <input class="edit-input" id="rss-name" placeholder="Feed naam" style="width:120px">
+      <input class="edit-input" id="rss-url" placeholder="Feed URL" style="width:220px">
+      <button class="btn-small" onclick="addFeed()">+ RSS</button>
+      <label class="btn-small" style="cursor:pointer;">OPML<input type="file" accept=".opml,.xml" style="display:none" onchange="importOpml(event)"></label>
+      <input class="edit-input" id="reddit-sub" placeholder="Subreddit" style="width:140px; margin-left:8px;">
+      <button class="btn-small" onclick="addSubreddit()">+ Reddit</button>
+    </div>
+  </div>
 
 </div><!-- /page -->
 
@@ -684,64 +689,6 @@ async function fetchFeed(feed) {
   });
 }
 
-async function loadFeeds() {
-  const feeds = getFeeds();
-  const container = document.getElementById('rss-container');
-  container.innerHTML = '';
-
-  const promises = feeds.map(async (feed, i) => {
-    const block = document.createElement('div');
-    block.className = 'feed-block';
-
-    const head = document.createElement('div');
-    head.className = 'feed-block-head';
-    head.innerHTML = `<span>${feed.name}</span>`;
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'feed-delete';
-    delBtn.textContent = '✕';
-    delBtn.onclick = () => deleteFeed(i);
-    head.appendChild(delBtn);
-
-    const itemsDiv = document.createElement('div');
-
-    try {
-      const items = await fetchFeed(feed);
-      if (items.length === 0) {
-        itemsDiv.innerHTML = '<div class="feed-error">Geen items gevonden</div>';
-      } else {
-        items.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'feed-item';
-          div.innerHTML = `<div class="feed-source">${feed.name}</div>`;
-          const a = document.createElement('a');
-          a.href = item.link || '#';
-          a.target = '_blank';
-          a.rel = 'noopener';
-          a.textContent = item.title;
-          div.appendChild(a);
-          itemsDiv.appendChild(div);
-        });
-      }
-    } catch(e) {
-      itemsDiv.innerHTML = `<div class="feed-error">Kon feed niet laden</div>`;
-    }
-
-    block.appendChild(head);
-    block.appendChild(itemsDiv);
-    return { block, idx: i };
-  });
-
-  const results = await Promise.allSettled(promises);
-  results.forEach(r => {
-    if (r.status === 'fulfilled' && r.value) {
-      container.appendChild(r.value.block);
-    }
-  });
-
-  updateFeedGridVisibility();
-}
-
 function addFeed() {
   const nameEl = document.getElementById('rss-name');
   const urlEl  = document.getElementById('rss-url');
@@ -754,14 +701,14 @@ function addFeed() {
   saveFeeds(feeds);
   nameEl.value = '';
   urlEl.value = '';
-  loadFeeds();
+  loadCarousel();
 }
 
 function deleteFeed(idx) {
   const feeds = getFeeds();
   feeds.splice(idx, 1);
   saveFeeds(feeds);
-  loadFeeds();
+  loadCarousel();
 }
 
 // ══════════════════════════════════════════════════════
@@ -785,151 +732,143 @@ async function fetchSubreddit(sub) {
   }));
 }
 
-async function loadSubreddits() {
-  const subs = getSubreddits();
-  const container = document.getElementById('reddit-container');
-  container.innerHTML = '';
-
-  const promises = subs.map(async (sub, i) => {
-    const block = document.createElement('div');
-    block.className = 'feed-block';
-
-    const head = document.createElement('div');
-    head.className = 'feed-block-head';
-    head.innerHTML = `<span>r/${sub}</span>`;
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'feed-delete';
-    delBtn.textContent = '✕';
-    delBtn.onclick = () => deleteSubreddit(i);
-    head.appendChild(delBtn);
-
-    const itemsDiv = document.createElement('div');
-
-    try {
-      const posts = await fetchSubreddit(sub);
-      if (posts.length === 0) {
-        itemsDiv.innerHTML = '<div class="feed-error">Geen posts gevonden</div>';
-      } else {
-        posts.forEach(post => {
-          const div = document.createElement('div');
-          div.className = 'feed-item';
-          div.innerHTML = `<div class="feed-source">r/${sub}</div>`;
-          const a = document.createElement('a');
-          a.href = 'https://reddit.com' + post.permalink;
-          a.target = '_blank';
-          a.rel = 'noopener';
-          a.textContent = post.title;
-          div.appendChild(a);
-          itemsDiv.appendChild(div);
-        });
-      }
-    } catch(e) {
-      itemsDiv.innerHTML = `<div class="feed-error">Kon r/${sub} niet laden</div>`;
-    }
-
-    block.appendChild(head);
-    block.appendChild(itemsDiv);
-    return block;
-  });
-
-  const results = await Promise.allSettled(promises);
-  results.forEach(r => {
-    if (r.status === 'fulfilled' && r.value) {
-      container.appendChild(r.value);
-    }
-  });
-
-  updateFeedGridVisibility();
-}
-
 function addSubreddit() {
   const subEl = document.getElementById('reddit-sub');
   const sub = subEl.value.trim().replace(/^r\//i, '');
   if (!sub) return;
-
   const subs = getSubreddits();
   subs.push(sub);
   saveSubreddits(subs);
   subEl.value = '';
-  loadSubreddits();
+  loadCarousel();
 }
 
 function deleteSubreddit(idx) {
   const subs = getSubreddits();
   subs.splice(idx, 1);
   saveSubreddits(subs);
-  loadSubreddits();
+  loadCarousel();
 }
 
 // ══════════════════════════════════════════════════════
-//  FEED GRID VISIBILITY
+//  CAROUSEL
 // ══════════════════════════════════════════════════════
-function updateFeedGridVisibility() {
-  // feed grid is always visible
-}
+const ITEMS_PER_PAGE = 4;
+let carouselPages = [];
+let carouselCurrent = 0;
 
-function loadFeeds() {
+async function loadCarousel() {
+  const track = document.getElementById('carousel-track');
+  track.style.transition = 'none';
+  track.innerHTML = '<div style="padding:14px 0;color:var(--text-dim);font-size:14px;">Laden…</div>';
+
   const feeds = getFeeds();
-  const container = document.getElementById('rss-container');
-  container.innerHTML = '';
+  const subs  = getSubreddits();
+  const allItems = [];
 
-  if (feeds.length === 0) {
-    updateFeedGridVisibility();
+  await Promise.allSettled([
+    ...feeds.map(async (feed, fi) => {
+      try {
+        const items = await fetchFeed(feed);
+        items.forEach(item => allItems.push({
+          source: feed.name,
+          title: item.title,
+          url: item.link || '#',
+          feedIdx: fi,
+          type: 'rss'
+        }));
+      } catch(e) {}
+    }),
+    ...subs.map(async (sub, si) => {
+      try {
+        const posts = await fetchSubreddit(sub);
+        posts.forEach(post => allItems.push({
+          source: 'r/' + sub,
+          title: post.title,
+          url: 'https://reddit.com' + post.permalink,
+          subIdx: si,
+          type: 'reddit'
+        }));
+      } catch(e) {}
+    })
+  ]);
+
+  renderCarousel(allItems);
+}
+
+function renderCarousel(items) {
+  const track = document.getElementById('carousel-track');
+  track.style.transition = 'none';
+  track.innerHTML = '';
+  carouselPages = [];
+  carouselCurrent = 0;
+
+  if (items.length === 0) {
+    track.innerHTML = '<div style="padding:14px 0;color:var(--text-dim);font-size:14px;">Geen feeds ingesteld — voeg een RSS feed of subreddit toe.</div>';
+    document.getElementById('carousel-pos').textContent = '';
+    document.getElementById('carousel-prev').disabled = true;
+    document.getElementById('carousel-next').disabled = true;
     return;
   }
 
-  const promises = feeds.map(async (feed, i) => {
-    const block = document.createElement('div');
-    block.className = 'feed-block';
+  for (let i = 0; i < items.length; i += ITEMS_PER_PAGE) {
+    carouselPages.push(items.slice(i, i + ITEMS_PER_PAGE));
+  }
 
-    const head = document.createElement('div');
-    head.className = 'feed-block-head';
-    head.innerHTML = `<span>${feed.name}</span>`;
+  const feeds = getFeeds();
+  const subs  = getSubreddits();
 
-    const delBtn = document.createElement('button');
-    delBtn.className = 'feed-delete';
-    delBtn.textContent = '✕';
-    delBtn.onclick = () => deleteFeed(i);
-    head.appendChild(delBtn);
+  carouselPages.forEach(page => {
+    const pageEl = document.createElement('div');
+    pageEl.className = 'carousel-page';
+    page.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'carousel-card';
 
-    const itemsDiv = document.createElement('div');
+      const src = document.createElement('div');
+      src.className = 'carousel-source';
+      src.appendChild(document.createTextNode(item.source));
 
-    try {
-      const items = await fetchFeed(feed);
-      if (items.length === 0) {
-        itemsDiv.innerHTML = '<div class="feed-error">Geen items gevonden</div>';
-      } else {
-        items.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'feed-item';
-          div.innerHTML = `<div class="feed-source">${feed.name}</div>`;
-          const a = document.createElement('a');
-          a.href = item.link || '#';
-          a.target = '_blank';
-          a.rel = 'noopener';
-          a.textContent = item.title;
-          div.appendChild(a);
-          itemsDiv.appendChild(div);
-        });
-      }
-    } catch(e) {
-      itemsDiv.innerHTML = `<div class="feed-error">Kon feed niet laden</div>`;
-    }
+      const del = document.createElement('button');
+      del.className = 'feed-delete';
+      del.textContent = '✕';
+      del.title = item.type === 'rss'
+        ? `Verwijder feed "${feeds[item.feedIdx]?.name}"`
+        : `Verwijder r/${subs[item.subIdx]}`;
+      del.onclick = item.type === 'rss'
+        ? () => deleteFeed(item.feedIdx)
+        : () => deleteSubreddit(item.subIdx);
+      src.appendChild(del);
 
-    block.appendChild(head);
-    block.appendChild(itemsDiv);
-    return block;
-  });
+      const a = document.createElement('a');
+      a.href = item.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = item.title;
 
-  Promise.allSettled(promises).then(results => {
-    results.forEach(r => {
-      if (r.status === 'fulfilled' && r.value) {
-        container.appendChild(r.value);
-      }
+      card.appendChild(src);
+      card.appendChild(a);
+      pageEl.appendChild(card);
     });
-    updateFeedGridVisibility();
+    track.appendChild(pageEl);
   });
+
+  updateCarouselPos();
+}
+
+function updateCarouselPos() {
+  const track = document.getElementById('carousel-track');
+  track.style.transition = 'transform 0.35s ease';
+  track.style.transform = `translateX(${-carouselCurrent * 100}%)`;
+  const total = carouselPages.length;
+  document.getElementById('carousel-pos').textContent = total > 0 ? `${carouselCurrent + 1} / ${total}` : '';
+  document.getElementById('carousel-prev').disabled = carouselCurrent === 0;
+  document.getElementById('carousel-next').disabled = carouselCurrent >= total - 1;
+}
+
+function carouselNav(dir) {
+  carouselCurrent = Math.max(0, Math.min(carouselPages.length - 1, carouselCurrent + dir));
+  updateCarouselPos();
 }
 
 // ══════════════════════════════════════════════════════
@@ -958,7 +897,7 @@ function importOpml(event) {
       }
     });
     saveFeeds(feeds);
-    loadFeeds();
+    loadCarousel();
     event.target.value = '';
     if (added > 0) alert(`${added} feed(s) toegevoegd.`);
   };
@@ -973,8 +912,7 @@ window.addEventListener('load', () => {
   loadWeather();
   loadJonaSchedule();
   renderQuicklinks();
-  loadFeeds();
-  loadSubreddits();
+  loadCarousel();
 });
 </script>
 </body>
