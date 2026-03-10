@@ -332,6 +332,27 @@ body::before {
 .weather-row-label { font-size: 15px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 .weather-row-val { font-family: var(--mono); font-size: 15px; font-weight: 400; text-align: right; }
 
+/* ── ADDRESS BAR ── */
+.address-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.address-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.address-input:focus { border-color: var(--text-muted); }
+.address-input::placeholder { color: var(--text-dim); }
+
 /* ── SKELETON ── */
 .skel {
   background: linear-gradient(90deg, var(--border) 25%, var(--bg2) 50%, var(--border) 75%);
@@ -490,6 +511,12 @@ body::before {
     <div class="masthead-right">
       <div class="clock" id="clock"></div>
     </div>
+  </div>
+
+  <!-- ADDRESS BAR -->
+  <div class="address-bar">
+    <input class="address-input" id="address-input" type="text" placeholder="Typ een adres…" onkeydown="if(event.key==='Enter') navigate()">
+    <button class="btn-small" onclick="navigate()">Go!</button>
   </div>
 
   <div class="grid">
@@ -653,6 +680,16 @@ async function gcal(path) {
 }
 
 // ══════════════════════════════════════════════════════
+//  ADDRESS BAR
+// ══════════════════════════════════════════════════════
+function navigate() {
+  let url = document.getElementById('address-input').value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  window.location.href = url;
+}
+
+// ══════════════════════════════════════════════════════
 //  CLOCK & DATE
 // ══════════════════════════════════════════════════════
 function startClock() {
@@ -727,12 +764,14 @@ async function loadCalendar() {
     const now = new Date();
     const fmt = d => d.toLocaleTimeString('nl', {hour:'2-digit',minute:'2-digit'});
 
-    const parsed = events.map(ev => {
-      const s = ev.start.dateTime ? new Date(ev.start.dateTime) : null;
-      const e = ev.end.dateTime ? new Date(ev.end.dateTime) : null;
-      const isNow = s && e && now >= s && now <= e;
-      return { ev, s, e, isNow };
-    });
+    const parsed = events
+      .map(ev => {
+        const s = ev.start.dateTime ? new Date(ev.start.dateTime) : null;
+        const e = ev.end.dateTime ? new Date(ev.end.dateTime) : null;
+        const isNow = s && e && now >= s && now <= e;
+        return { ev, s, e, isNow };
+      })
+      .filter(({ ev, e }) => !ev.end.dateTime || e > now); // hide past events
 
     const anyNow = parsed.some(p => p.isNow);
 
