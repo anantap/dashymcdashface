@@ -777,7 +777,7 @@ async function loadWeather() {
     const maxRain = Math.max(...d.hourly.precipitation_probability.slice(0,24));
 
     document.getElementById('weather-detail').innerHTML = `
-      <div class="weather-row"><span class="weather-row-label">Actueel</span><span class="weather-row-val">${Math.round(c.temperature_2m)}°C · ${WMO_CODES[code]||''}</span></div>
+      <div class="weather-row"><span class="weather-row-label">Actueel</span><span class="weather-row-val">${WMO_CODES[code]||''}</span></div>
       <div class="weather-row"><span class="weather-row-label">Min / Max</span><span class="weather-row-val">${Math.round(minTemp)}° / ${Math.round(maxTemp)}°</span></div>
       <div class="weather-row"><span class="weather-row-label">Wind</span><span class="weather-row-val">${Math.round(c.windspeed_10m)} km/u</span></div>
       <div class="weather-row"><span class="weather-row-label">Luchtvochtigheid</span><span class="weather-row-val">${c.relativehumidity_2m}%</span></div>
