@@ -66,20 +66,73 @@ body::before {
   color: var(--text-muted);
 }
 
-.clock {
+.masthead-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ── FLIP CLOCK ── */
+.flip-clock {
+  display: flex;
+  align-items: center;
   font-family: var(--mono);
   font-size: 30px;
   font-weight: 300;
   letter-spacing: 0.04em;
   color: var(--text);
   line-height: 1;
+  gap: 0;
 }
+
+.flip-digit {
+  height: 1em;
+  overflow: hidden;
+  display: inline-block;
+  width: 0.62em;
+}
+
+.flip-reel {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease;
+}
+
+.flip-reel span {
+  display: block;
+  height: 1em;
+  line-height: 1;
+}
+
+.flip-colon {
+  display: inline-block;
+  width: 0.3em;
+  text-align: center;
+  user-select: none;
+}
+
+/* ── EDIT BUTTON ── */
+.btn-edit {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: var(--r);
+  transition: all 0.15s;
+}
+.btn-edit:hover { border-color: var(--text); color: var(--text); }
+body.edit-mode .btn-edit { border-color: var(--accent); color: var(--accent); }
 
 /* ── ADDRESS BAR ── */
 .address-bar {
   display: flex;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 .address-input {
   flex: 1;
@@ -111,12 +164,88 @@ body::before {
 }
 .btn-small:hover { border-color: var(--text); color: var(--text); }
 
+/* ── QUICKLINKS ── */
+.quicklinks-row {
+  display: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.quicklinks-row.visible { display: flex; }
+
+.quicklink-pill {
+  position: relative;
+  display: inline-block;
+}
+
+.quicklink-pill a {
+  display: inline-block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 6px 14px;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.quicklink-pill a:hover { color: var(--text); border-color: var(--text-muted); }
+
+.item-delete {
+  display: none;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--mono);
+  z-index: 2;
+}
+body.edit-mode .item-delete { display: block; }
+
+/* ── EDIT FORMS ── */
+.edit-form {
+  display: none;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+body.edit-mode .edit-form { display: flex; }
+
+.edit-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 5px 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.edit-input:focus { border-color: var(--text-muted); }
+.edit-input::placeholder { color: var(--text-dim); }
+
 /* ── GRID ── */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   align-items: stretch;
+  margin-bottom: 20px;
 }
 
 .col-right {
@@ -144,6 +273,40 @@ body::before {
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 12px;
+}
+
+.card-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.card-value {
+  font-family: var(--mono);
+  font-size: 25px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.card-sub {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 2px;
 }
 
 /* ── WEATHER ── */
@@ -190,6 +353,18 @@ body::before {
 .weather-row-label { font-size: 15px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 .weather-row-val { font-family: var(--mono); font-size: 15px; font-weight: 400; text-align: right; }
 
+/* ── ZON ── */
+.zon-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.zon-row:last-child { border-bottom: none; }
+.zon-label { font-size: 14px; color: var(--text-muted); }
+.zon-val { font-size: 14px; color: var(--text); }
+
 /* ── SKELETON ── */
 .skel {
   background: linear-gradient(90deg, var(--border) 25%, var(--bg2) 50%, var(--border) 75%);
@@ -213,13 +388,88 @@ body::before {
 .section { animation: fadeIn 0.5s ease forwards; opacity: 0; }
 .section:nth-child(1) { animation-delay: 0.05s; }
 .section:nth-child(2) { animation-delay: 0.1s; }
+.section:nth-child(3) { animation-delay: 0.15s; }
+.section:nth-child(4) { animation-delay: 0.2s; }
+
+/* ── FEED GRID ── */
+.feed-grid {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.feed-grid.visible { display: grid; }
+
+/* ── FEED ITEMS ── */
+.feed-source {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+}
+
+.feed-item {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.feed-item:last-child { border-bottom: none; }
+
+.feed-item a {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text);
+  text-decoration: none;
+  line-height: 1.4;
+  display: block;
+}
+.feed-item a:hover { color: var(--text-muted); }
+
+.feed-block {
+  margin-bottom: 16px;
+}
+
+.feed-block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.feed-delete {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 0 2px;
+  transition: color 0.15s;
+}
+.feed-delete:hover { color: var(--accent); }
+body.edit-mode .feed-delete { display: inline; }
+
+.feed-error {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  padding: 8px 0;
+}
 
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
   .page { padding: 0 16px 32px; }
   .masthead { padding: 14px 0 10px; }
-  .clock { font-size: 25px; }
+  .flip-clock { font-size: 22px; }
   .grid { grid-template-columns: 1fr; }
+  .feed-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -230,7 +480,10 @@ body::before {
   <!-- MASTHEAD -->
   <div class="masthead fade-in">
     <div class="masthead-date" id="date-str"></div>
-    <div class="clock" id="clock"></div>
+    <div class="masthead-right">
+      <button class="btn-edit" id="edit-btn" onclick="toggleEditMode()">Bewerken</button>
+      <div class="flip-clock" id="flip-clock" aria-live="off"></div>
+    </div>
   </div>
 
   <!-- ADDRESS BAR -->
@@ -239,15 +492,51 @@ body::before {
     <button class="btn-small" onclick="navigate()">Go!</button>
   </div>
 
+  <!-- QUICKLINKS ROW -->
+  <div class="quicklinks-row" id="quicklinks-row">
+    <div id="quicklinks-list" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;"></div>
+    <div class="edit-form" id="quicklinks-form">
+      <input class="edit-input" id="ql-name" placeholder="Naam" style="width:120px">
+      <input class="edit-input" id="ql-url" placeholder="URL" style="width:200px">
+      <button class="btn-small" onclick="addQuicklink()">Voeg toe</button>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
   <div class="grid">
 
-    <!-- LEFT COL: Jona -->
+    <!-- LEFT COL -->
     <div>
+      <!-- Jona -->
       <div class="section">
         <div class="section-head">Jona</div>
-        <div id="jona-schedule" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px;">
-          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Vandaag</div>
-          <div style="font-family: var(--mono); font-size: 25px; font-weight: 400; color: var(--text);">—</div>
+        <div id="jona-schedule" class="card">
+          <div class="card-label">Vandaag</div>
+          <div class="card-value">—</div>
+        </div>
+      </div>
+
+      <!-- Zon -->
+      <div class="section">
+        <div class="section-head">Zon</div>
+        <div class="card" id="zon-block">
+          <div class="zon-row">
+            <span class="zon-label">Zonsopgang</span>
+            <span class="zon-val" id="sunrise-val">—</span>
+          </div>
+          <div class="zon-row">
+            <span class="zon-label">Zonsondergang</span>
+            <span class="zon-val" id="sunset-val">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regen komend uur -->
+      <div class="section">
+        <div class="section-head">Regen komend uur</div>
+        <div class="card" id="precip-block">
+          <div class="card-value" id="precip-val">—</div>
+          <div class="card-sub" id="precip-sub" style="display:none;"></div>
         </div>
       </div>
     </div>
@@ -259,8 +548,7 @@ body::before {
         <div class="weather-block">
           <div class="weather-block-header">
             <span class="weather-block-temp" id="weather-temp-block">—</span>
-            <span class="weather-block-condition"> — </span>
-            <span class="weather-block-condition" id="weather-condition"></span>
+            <span class="weather-block-condition" id="weather-condition"> — </span>
           </div>
           <div id="weather-detail"><div class="skel"></div><div class="skel" style="width:70%"></div></div>
         </div>
@@ -269,9 +557,41 @@ body::before {
 
   </div><!-- /grid -->
 
+  <!-- FEED GRID -->
+  <div class="feed-grid" id="feed-grid">
+
+    <!-- RSS Nieuws -->
+    <div>
+      <div class="section-head" style="margin-bottom:12px;">
+        Nieuws
+      </div>
+      <div id="rss-container"></div>
+      <div class="edit-form" id="rss-form">
+        <input class="edit-input" id="rss-name" placeholder="Naam" style="width:120px">
+        <input class="edit-input" id="rss-url" placeholder="Feed URL" style="width:220px">
+        <button class="btn-small" onclick="addFeed()">Voeg toe</button>
+      </div>
+    </div>
+
+    <!-- Reddit -->
+    <div>
+      <div class="section-head" style="margin-bottom:12px;">
+        Reddit
+      </div>
+      <div id="reddit-container"></div>
+      <div class="edit-form" id="reddit-form">
+        <input class="edit-input" id="reddit-sub" placeholder="Subreddit naam" style="width:180px">
+        <button class="btn-small" onclick="addSubreddit()">Voeg toe</button>
+      </div>
+    </div>
+
+  </div><!-- /feed-grid -->
+
 </div><!-- /page -->
 
 <script>
+'use strict';
+
 // ══════════════════════════════════════════════════════
 //  ADDRESS BAR
 // ══════════════════════════════════════════════════════
@@ -283,21 +603,92 @@ function navigate() {
 }
 
 // ══════════════════════════════════════════════════════
-//  CLOCK & DATE
+//  FLIP CLOCK
 // ══════════════════════════════════════════════════════
+const flipDigits = {};
+
+function initFlipClock() {
+  const container = document.getElementById('flip-clock');
+  container.innerHTML = '';
+
+  // HH:MM:SS — indices: 0,1 colon 2,3 colon 4,5
+  const positions = ['h1','h2','c1','m1','m2','c2','s1','s2'];
+
+  positions.forEach(id => {
+    if (id.startsWith('c')) {
+      const colon = document.createElement('span');
+      colon.className = 'flip-colon';
+      colon.textContent = ':';
+      container.appendChild(colon);
+    } else {
+      const wrap = document.createElement('span');
+      wrap.className = 'flip-digit';
+      const reel = document.createElement('div');
+      reel.className = 'flip-reel';
+      const top = document.createElement('span');
+      top.textContent = '0';
+      const bot = document.createElement('span');
+      bot.textContent = '0';
+      reel.appendChild(top);
+      reel.appendChild(bot);
+      wrap.appendChild(reel);
+      container.appendChild(wrap);
+      flipDigits[id] = { reel, top, bot, current: '0' };
+    }
+  });
+}
+
+function updateFlipDigit(id, newVal) {
+  const d = flipDigits[id];
+  if (!d) return;
+  if (d.current === newVal) return;
+  d.current = newVal;
+  d.bot.textContent = newVal;
+  d.reel.style.transition = 'transform 0.15s ease';
+  d.reel.style.transform = 'translateY(-50%)';
+  d.reel.addEventListener('transitionend', function handler() {
+    d.reel.removeEventListener('transitionend', handler);
+    d.top.textContent = newVal;
+    d.reel.style.transition = 'none';
+    d.reel.style.transform = 'translateY(0)';
+  });
+}
+
 function startClock() {
   const days = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
   const months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
 
   function tick() {
     const now = new Date();
-    document.getElementById('clock').textContent =
-      now.toLocaleTimeString('nl', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    const ss = String(now.getSeconds()).padStart(2,'0');
+
+    updateFlipDigit('h1', hh[0]);
+    updateFlipDigit('h2', hh[1]);
+    updateFlipDigit('m1', mm[0]);
+    updateFlipDigit('m2', mm[1]);
+    updateFlipDigit('s1', ss[0]);
+    updateFlipDigit('s2', ss[1]);
+
     document.getElementById('date-str').textContent =
       `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
   }
   tick();
   setInterval(tick, 1000);
+}
+
+// ══════════════════════════════════════════════════════
+//  EDIT MODE
+// ══════════════════════════════════════════════════════
+let editMode = false;
+
+function toggleEditMode() {
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  document.getElementById('edit-btn').textContent = editMode ? 'Klaar' : 'Bewerken';
+  updateFeedGridVisibility();
+  updateQuicklinksVisibility();
 }
 
 // ══════════════════════════════════════════════════════
@@ -311,11 +702,19 @@ const WMO_CODES = {
 
 async function loadWeather() {
   try {
-    const resp = await fetch('https://api.open-meteo.com/v1/forecast?latitude=52.0705&longitude=4.3007&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m&hourly=temperature_2m,precipitation_probability&forecast_days=1&timezone=Europe/Amsterdam');
+    const url = 'https://api.open-meteo.com/v1/forecast' +
+      '?latitude=52.0705&longitude=4.3007' +
+      '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m' +
+      '&hourly=temperature_2m,precipitation_probability,precipitation' +
+      '&daily=sunrise,sunset' +
+      '&forecast_days=1&timezone=Europe/Amsterdam';
+
+    const resp = await fetch(url);
     const d = await resp.json();
     const c = d.current;
     const code = c.weathercode;
 
+    // Main weather
     document.getElementById('weather-temp-block').textContent = Math.round(c.temperature_2m) + '°C';
     document.getElementById('weather-condition').textContent = WMO_CODES[code] || '';
 
@@ -329,6 +728,33 @@ async function loadWeather() {
       <div class="weather-row"><span class="weather-row-label">Luchtvochtigheid</span><span class="weather-row-val">${c.relativehumidity_2m}%</span></div>
       <div class="weather-row"><span class="weather-row-label">Kans op regen</span><span class="weather-row-val">${maxRain}%</span></div>
     `;
+
+    // Sunrise / Sunset
+    if (d.daily && d.daily.sunrise && d.daily.sunset) {
+      const riseStr = d.daily.sunrise[0]; // e.g. "2024-03-10T07:23"
+      const setStr  = d.daily.sunset[0];
+      document.getElementById('sunrise-val').textContent = riseStr.slice(11,16);
+      document.getElementById('sunset-val').textContent  = setStr.slice(11,16);
+    }
+
+    // Precipitation next hour
+    if (d.hourly && d.hourly.precipitation) {
+      const now = new Date();
+      const hourIdx = now.getHours();
+      const precip = d.hourly.precipitation;
+      const total = (precip[hourIdx] || 0) + (precip[hourIdx + 1] || 0);
+      const precipVal = document.getElementById('precip-val');
+      const precipSub = document.getElementById('precip-sub');
+      if (total === 0) {
+        precipVal.textContent = 'Droog';
+        precipSub.style.display = 'none';
+      } else {
+        precipVal.textContent = '~' + total.toFixed(1) + 'mm';
+        precipSub.textContent = 'verwacht dit uur';
+        precipSub.style.display = 'block';
+      }
+    }
+
   } catch(e) {
     document.getElementById('weather-detail').innerHTML = '<div style="font-size:14px;color:var(--text-dim);padding:10px 0">Weer niet beschikbaar</div>';
   }
@@ -351,18 +777,399 @@ function loadJonaSchedule() {
   const location = schedule[today] || '—';
   const el = document.getElementById('jona-schedule');
   el.innerHTML = `
-    <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Vandaag</div>
-    <div style="font-family: var(--mono); font-size: 25px; font-weight: 400; color: var(--text);">${location}</div>
+    <div class="card-label">Vandaag</div>
+    <div class="card-value">${location}</div>
   `;
+}
+
+// ══════════════════════════════════════════════════════
+//  LOCAL STORAGE HELPERS
+// ══════════════════════════════════════════════════════
+function lsGet(key, fallback) {
+  try {
+    const val = localStorage.getItem(key);
+    return val ? JSON.parse(val) : fallback;
+  } catch(e) {
+    return fallback;
+  }
+}
+
+function lsSet(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════════
+//  QUICKLINKS
+// ══════════════════════════════════════════════════════
+function getQuicklinks() {
+  return lsGet('dmdf-quicklinks', []);
+}
+
+function saveQuicklinks(links) {
+  lsSet('dmdf-quicklinks', links);
+}
+
+function renderQuicklinks() {
+  const links = getQuicklinks();
+  const list = document.getElementById('quicklinks-list');
+  list.innerHTML = '';
+
+  links.forEach((link, i) => {
+    const pill = document.createElement('div');
+    pill.className = 'quicklink-pill';
+
+    const a = document.createElement('a');
+    a.href = /^https?:\/\//i.test(link.url) ? link.url : 'https://' + link.url;
+    a.textContent = link.name;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'item-delete';
+    delBtn.textContent = '✕';
+    delBtn.title = 'Verwijder';
+    delBtn.onclick = () => deleteQuicklink(i);
+
+    pill.appendChild(a);
+    pill.appendChild(delBtn);
+    list.appendChild(pill);
+  });
+
+  updateQuicklinksVisibility();
+}
+
+function updateQuicklinksVisibility() {
+  const links = getQuicklinks();
+  const row = document.getElementById('quicklinks-row');
+  if (links.length > 0 || editMode) {
+    row.classList.add('visible');
+  } else {
+    row.classList.remove('visible');
+  }
+}
+
+function addQuicklink() {
+  const nameEl = document.getElementById('ql-name');
+  const urlEl  = document.getElementById('ql-url');
+  const name = nameEl.value.trim();
+  const url  = urlEl.value.trim();
+  if (!name || !url) return;
+
+  const links = getQuicklinks();
+  links.push({ name, url });
+  saveQuicklinks(links);
+  nameEl.value = '';
+  urlEl.value = '';
+  renderQuicklinks();
+}
+
+function deleteQuicklink(idx) {
+  const links = getQuicklinks();
+  links.splice(idx, 1);
+  saveQuicklinks(links);
+  renderQuicklinks();
+}
+
+// ══════════════════════════════════════════════════════
+//  RSS FEEDS
+// ══════════════════════════════════════════════════════
+function getFeeds() {
+  return lsGet('dmdf-rss-feeds', []);
+}
+
+function saveFeeds(feeds) {
+  lsSet('dmdf-rss-feeds', feeds);
+}
+
+async function fetchFeed(feed) {
+  const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feed.url);
+  const resp = await fetch(proxyUrl);
+  const text = await resp.text();
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, 'text/xml');
+  const items = Array.from(xml.querySelectorAll('item')).slice(0, 5);
+
+  return items.map(item => {
+    const title = item.querySelector('title') ? item.querySelector('title').textContent.trim() : '(geen titel)';
+    let link = '';
+    const linkEl = item.querySelector('link');
+    if (linkEl) {
+      link = linkEl.textContent.trim() || linkEl.getAttribute('href') || '';
+    }
+    if (!link) {
+      const guidEl = item.querySelector('guid');
+      if (guidEl) link = guidEl.textContent.trim();
+    }
+    return { title, link };
+  });
+}
+
+async function loadFeeds() {
+  const feeds = getFeeds();
+  const container = document.getElementById('rss-container');
+  container.innerHTML = '';
+
+  const promises = feeds.map(async (feed, i) => {
+    const block = document.createElement('div');
+    block.className = 'feed-block';
+
+    const head = document.createElement('div');
+    head.className = 'feed-block-head';
+    head.innerHTML = `<span>${feed.name}</span>`;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'feed-delete';
+    delBtn.textContent = '✕';
+    delBtn.onclick = () => deleteFeed(i);
+    head.appendChild(delBtn);
+
+    const itemsDiv = document.createElement('div');
+
+    try {
+      const items = await fetchFeed(feed);
+      if (items.length === 0) {
+        itemsDiv.innerHTML = '<div class="feed-error">Geen items gevonden</div>';
+      } else {
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'feed-item';
+          div.innerHTML = `<div class="feed-source">${feed.name}</div>`;
+          const a = document.createElement('a');
+          a.href = item.link || '#';
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = item.title;
+          div.appendChild(a);
+          itemsDiv.appendChild(div);
+        });
+      }
+    } catch(e) {
+      itemsDiv.innerHTML = `<div class="feed-error">Kon feed niet laden</div>`;
+    }
+
+    block.appendChild(head);
+    block.appendChild(itemsDiv);
+    return { block, idx: i };
+  });
+
+  const results = await Promise.allSettled(promises);
+  results.forEach(r => {
+    if (r.status === 'fulfilled' && r.value) {
+      container.appendChild(r.value.block);
+    }
+  });
+
+  updateFeedGridVisibility();
+}
+
+function addFeed() {
+  const nameEl = document.getElementById('rss-name');
+  const urlEl  = document.getElementById('rss-url');
+  const name = nameEl.value.trim();
+  const url  = urlEl.value.trim();
+  if (!name || !url) return;
+
+  const feeds = getFeeds();
+  feeds.push({ name, url });
+  saveFeeds(feeds);
+  nameEl.value = '';
+  urlEl.value = '';
+  loadFeeds();
+}
+
+function deleteFeed(idx) {
+  const feeds = getFeeds();
+  feeds.splice(idx, 1);
+  saveFeeds(feeds);
+  loadFeeds();
+}
+
+// ══════════════════════════════════════════════════════
+//  SUBREDDITS
+// ══════════════════════════════════════════════════════
+function getSubreddits() {
+  return lsGet('dmdf-subreddits', []);
+}
+
+function saveSubreddits(subs) {
+  lsSet('dmdf-subreddits', subs);
+}
+
+async function fetchSubreddit(sub) {
+  const url = `https://www.reddit.com/r/${sub}/hot.json?limit=5`;
+  const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+  const data = await resp.json();
+  return data.data.children.slice(0, 5).map(c => ({
+    title: c.data.title,
+    permalink: c.data.permalink
+  }));
+}
+
+async function loadSubreddits() {
+  const subs = getSubreddits();
+  const container = document.getElementById('reddit-container');
+  container.innerHTML = '';
+
+  const promises = subs.map(async (sub, i) => {
+    const block = document.createElement('div');
+    block.className = 'feed-block';
+
+    const head = document.createElement('div');
+    head.className = 'feed-block-head';
+    head.innerHTML = `<span>r/${sub}</span>`;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'feed-delete';
+    delBtn.textContent = '✕';
+    delBtn.onclick = () => deleteSubreddit(i);
+    head.appendChild(delBtn);
+
+    const itemsDiv = document.createElement('div');
+
+    try {
+      const posts = await fetchSubreddit(sub);
+      if (posts.length === 0) {
+        itemsDiv.innerHTML = '<div class="feed-error">Geen posts gevonden</div>';
+      } else {
+        posts.forEach(post => {
+          const div = document.createElement('div');
+          div.className = 'feed-item';
+          div.innerHTML = `<div class="feed-source">r/${sub}</div>`;
+          const a = document.createElement('a');
+          a.href = 'https://reddit.com' + post.permalink;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = post.title;
+          div.appendChild(a);
+          itemsDiv.appendChild(div);
+        });
+      }
+    } catch(e) {
+      itemsDiv.innerHTML = `<div class="feed-error">Kon r/${sub} niet laden</div>`;
+    }
+
+    block.appendChild(head);
+    block.appendChild(itemsDiv);
+    return block;
+  });
+
+  const results = await Promise.allSettled(promises);
+  results.forEach(r => {
+    if (r.status === 'fulfilled' && r.value) {
+      container.appendChild(r.value);
+    }
+  });
+
+  updateFeedGridVisibility();
+}
+
+function addSubreddit() {
+  const subEl = document.getElementById('reddit-sub');
+  const sub = subEl.value.trim().replace(/^r\//i, '');
+  if (!sub) return;
+
+  const subs = getSubreddits();
+  subs.push(sub);
+  saveSubreddits(subs);
+  subEl.value = '';
+  loadSubreddits();
+}
+
+function deleteSubreddit(idx) {
+  const subs = getSubreddits();
+  subs.splice(idx, 1);
+  saveSubreddits(subs);
+  loadSubreddits();
+}
+
+// ══════════════════════════════════════════════════════
+//  FEED GRID VISIBILITY
+// ══════════════════════════════════════════════════════
+function updateFeedGridVisibility() {
+  const feeds = getFeeds();
+  const subs  = getSubreddits();
+  const grid  = document.getElementById('feed-grid');
+  if (feeds.length > 0 || subs.length > 0 || editMode) {
+    grid.classList.add('visible');
+  } else {
+    grid.classList.remove('visible');
+  }
+}
+
+function loadFeeds() {
+  const feeds = getFeeds();
+  const container = document.getElementById('rss-container');
+  container.innerHTML = '';
+
+  if (feeds.length === 0) {
+    updateFeedGridVisibility();
+    return;
+  }
+
+  const promises = feeds.map(async (feed, i) => {
+    const block = document.createElement('div');
+    block.className = 'feed-block';
+
+    const head = document.createElement('div');
+    head.className = 'feed-block-head';
+    head.innerHTML = `<span>${feed.name}</span>`;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'feed-delete';
+    delBtn.textContent = '✕';
+    delBtn.onclick = () => deleteFeed(i);
+    head.appendChild(delBtn);
+
+    const itemsDiv = document.createElement('div');
+
+    try {
+      const items = await fetchFeed(feed);
+      if (items.length === 0) {
+        itemsDiv.innerHTML = '<div class="feed-error">Geen items gevonden</div>';
+      } else {
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'feed-item';
+          div.innerHTML = `<div class="feed-source">${feed.name}</div>`;
+          const a = document.createElement('a');
+          a.href = item.link || '#';
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = item.title;
+          div.appendChild(a);
+          itemsDiv.appendChild(div);
+        });
+      }
+    } catch(e) {
+      itemsDiv.innerHTML = `<div class="feed-error">Kon feed niet laden</div>`;
+    }
+
+    block.appendChild(head);
+    block.appendChild(itemsDiv);
+    return block;
+  });
+
+  Promise.allSettled(promises).then(results => {
+    results.forEach(r => {
+      if (r.status === 'fulfilled' && r.value) {
+        container.appendChild(r.value);
+      }
+    });
+    updateFeedGridVisibility();
+  });
 }
 
 // ══════════════════════════════════════════════════════
 //  BOOT
 // ══════════════════════════════════════════════════════
 window.addEventListener('load', () => {
+  initFlipClock();
   startClock();
   loadWeather();
   loadJonaSchedule();
+  renderQuicklinks();
+  loadFeeds();
+  loadSubreddits();
   document.getElementById('address-input').focus();
 });
 </script>
