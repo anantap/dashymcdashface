@@ -269,35 +269,6 @@ body::before {
 .mail-action-btn.read:hover { border-color: var(--blue); color: var(--blue); }
 .mail-item.removing { opacity: 0; transition: opacity 0.25s; }
 
-/* ── HUCKLEBERRY ── */
-.huck-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.huck-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 10px 12px;
-}
-.huck-label {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-.huck-value {
-  font-family: var(--mono);
-  font-size: 25px;
-  font-weight: 400;
-  color: var(--text);
-  line-height: 1.2;
-}
-.huck-sub { font-size: 14px; color: var(--text-muted); margin-top: 2px; }
 
 
 /* ── WEATHER ── */
@@ -511,21 +482,9 @@ body::before {
       <!-- JONA -->
       <div class="section">
         <div class="section-head">Jona</div>
-        <div id="jona-schedule" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; margin-bottom: 12px;">
+        <div id="jona-schedule" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px;">
           <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Vandaag</div>
           <div style="font-family: var(--mono); font-size: 25px; font-weight: 400; color: var(--text);">—</div>
-        </div>
-        <div class="huck-grid">
-          <div class="huck-card">
-            <div class="huck-label">Laatste slaap</div>
-            <div class="huck-value" id="huck-sleep">—</div>
-            <div class="huck-sub" id="huck-sleep-sub"></div>
-          </div>
-          <div class="huck-card">
-            <div class="huck-label">Laatste voeding</div>
-            <div class="huck-value" id="huck-feed">—</div>
-            <div class="huck-sub" id="huck-feed-sub"></div>
-          </div>
         </div>
       </div>
     </div>
@@ -563,10 +522,6 @@ body::before {
 const CONFIG = {
   GOOGLE_CLIENT_ID: '820314194609-k003tj0bs939icr9jp8tvkirbhl6u267.apps.googleusercontent.com',
 
-  // Huckleberry bridge (jouw PC Stick thuis)
-  // Als je thuis bent: 'http://192.168.x.x:PORT'
-  // Als je extern bent: leeg laten of via ngrok/cloudflared tunnel
-  HUCKLEBERRY_URL: 'http://192.168.178.252:3000',
 
 };
 
@@ -621,7 +576,6 @@ function onAuthenticated() {
   loadWeather();
   loadCalendar();
   loadMail();
-  loadHuckleberry();
   loadJonaSchedule();
 }
 
@@ -870,38 +824,6 @@ async function markAsRead(id) {
   } catch(e) { alert('Markeren mislukt: ' + e.message); }
 }
 
-// ══════════════════════════════════════════════════════
-//  HUCKLEBERRY BRIDGE
-// ══════════════════════════════════════════════════════
-async function loadHuckleberry() {
-  if (!CONFIG.HUCKLEBERRY_URL) {
-    document.getElementById('huck-sleep').textContent = '—';
-    document.getElementById('huck-sleep-sub').textContent = 'Geen URL ingesteld';
-    document.getElementById('huck-feed').textContent = '—';
-    document.getElementById('huck-feed-sub').textContent = 'Zie CONFIG.HUCKLEBERRY_URL';
-    return;
-  }
-
-  try {
-    const resp = await fetch(CONFIG.HUCKLEBERRY_URL + '/latest', { signal: AbortSignal.timeout(4000) });
-    const data = await resp.json();
-
-    if (data.sleep) {
-      const d = new Date(data.sleep.end || data.sleep.start);
-      document.getElementById('huck-sleep').textContent = d.toLocaleTimeString('nl', {hour:'2-digit',minute:'2-digit'});
-      document.getElementById('huck-sleep-sub').textContent = data.sleep.duration || timeAgo(d) + ' geleden';
-    }
-
-    if (data.feeding) {
-      const d = new Date(data.feeding.time);
-      document.getElementById('huck-feed').textContent = d.toLocaleTimeString('nl', {hour:'2-digit',minute:'2-digit'});
-      document.getElementById('huck-feed-sub').textContent = timeAgo(d) + ' geleden';
-    }
-  } catch(e) {
-    document.getElementById('huck-sleep-sub').textContent = 'Niet bereikbaar';
-    document.getElementById('huck-feed-sub').textContent = 'Niet bereikbaar';
-  }
-}
 
 
 // ══════════════════════════════════════════════════════
