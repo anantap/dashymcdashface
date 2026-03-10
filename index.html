@@ -516,7 +516,7 @@ body::before {
   <!-- ADDRESS BAR -->
   <div class="address-bar">
     <input class="address-input" id="address-input" type="text" placeholder="Typ een adres…" onkeydown="if(event.key==='Enter') navigate()">
-    <button class="btn-small" onclick="navigate()">Go!</button>
+    <button class="btn-small" onclick="navigate()" style="border-radius: var(--r)">Go!</button>
   </div>
 
   <div class="grid">
@@ -647,6 +647,7 @@ function onAuthenticated() {
   dashboardLoaded = true;
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('main-page').style.display = 'block';
+  document.getElementById('address-input').focus();
   startClock();
   loadWeather();
   loadCalendar();
