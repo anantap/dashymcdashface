@@ -195,6 +195,7 @@ body::before {
 }
 .cal-item:last-child { margin-bottom: 0; }
 .cal-item.now { border-color: var(--accent); border-left: 2px solid var(--accent); }
+.cal-item.dim { opacity: 0.4; }
 
 .cal-time {
   font-family: var(--mono);
@@ -712,19 +713,27 @@ async function loadCalendar() {
     if (!events.length) { el.innerHTML = '<div class="empty">Geen afspraken vandaag</div>'; return; }
 
     const now = new Date();
-    el.innerHTML = events.map(ev => {
+    const fmt = d => d.toLocaleTimeString('nl', {hour:'2-digit',minute:'2-digit'});
+
+    const parsed = events.map(ev => {
       const s = ev.start.dateTime ? new Date(ev.start.dateTime) : null;
       const e = ev.end.dateTime ? new Date(ev.end.dateTime) : null;
-      const allDay = !ev.start.dateTime;
       const isNow = s && e && now >= s && now <= e;
+      return { ev, s, e, isNow };
+    });
+
+    const anyNow = parsed.some(p => p.isNow);
+
+    el.innerHTML = parsed.map(({ ev, s, e, isNow }) => {
+      const allDay = !ev.start.dateTime;
       const isCancelled = ev.status === 'cancelled';
-      const fmt = d => d.toLocaleTimeString('nl', {hour:'2-digit',minute:'2-digit'});
       const attendees = (ev.attendees||[]).map(a => a.displayName || a.email.split('@')[0]).slice(0,3).join(', ');
+      const dim = anyNow && !isNow;
 
       let badge = '';
       if (isCancelled) badge = '<span class="cal-badge badge-cancel">geannuleerd</span>';
 
-      return `<div class="cal-item${isNow?' now':''}">
+      return `<div class="cal-item${isNow ? ' now' : ''}${dim ? ' dim' : ''}">
         <div class="cal-time">${allDay ? 'Hele dag' : s ? (e ? `${fmt(s)} – ${fmt(e)}` : fmt(s)) : '—'}</div>
         <div class="cal-body">
           <div class="cal-title">${ev.summary || '(geen titel)'}</div>
@@ -848,7 +857,9 @@ function removeMailItem(id) {
     const list = document.getElementById('mail-list');
     if (!list.querySelector('.mail-item')) {
       const section = document.getElementById('inbox-section');
-      section.classList.add('fading-out');
+      section.style.animation = 'none';
+      section.style.transition = 'opacity 0.4s';
+      section.style.opacity = '0';
       setTimeout(() => section.style.display = 'none', 420);
     }
   }, 260);
