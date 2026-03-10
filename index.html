@@ -505,6 +505,10 @@ body::before {
       <!-- HUCKLEBERRY -->
       <div class="section">
         <div class="section-head">Jona</div>
+        <div id="jona-schedule" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; margin-bottom: 12px;">
+          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Vandaag</div>
+          <div style="font-family: var(--serif); font-size: 25px; font-weight: 400; color: var(--text);">—</div>
+        </div>
         <div class="huck-grid">
           <div class="huck-card">
             <div class="huck-label">Laatste slaap</div>
@@ -578,7 +582,7 @@ function initGoogleAuth() {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main-page').style.display = 'block';
     document.getElementById('config-banner').classList.add('show');
-    loadWeather(); loadHuckleberry(); loadNotes();
+    loadWeather(); loadHuckleberry(); loadNotes(); loadJonaSchedule();
     startClock();
     return;
   }
@@ -622,6 +626,7 @@ function onAuthenticated() {
   loadMail();
   loadHuckleberry();
   loadNotes();
+  loadJonaSchedule();
 }
 
 function signOut() {
@@ -859,6 +864,29 @@ async function loadHuckleberry() {
 
 
 // ══════════════════════════════════════════════════════
+//  JONA SCHEDULE
+// ══════════════════════════════════════════════════════
+function loadJonaSchedule() {
+  const schedule = {
+    0: 'Papadag',      // Sunday (not in schedule, but default)
+    1: 'Papadag',      // Monday
+    2: 'Opa & Omadag', // Tuesday
+    3: 'Mamadag',      // Wednesday
+    4: 'Crèche',        // Thursday
+    5: 'Crèche',        // Friday
+    6: 'Papadag'       // Saturday (not in schedule, but default)
+  };
+  
+  const today = new Date().getDay();
+  const location = schedule[today] || '—';
+  const el = document.getElementById('jona-schedule');
+  el.innerHTML = `
+    <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Vandaag</div>
+    <div style="font-family: var(--serif); font-size: 25px; font-weight: 400; color: var(--text);">${location}</div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════
 //  NOTES (localStorage)
 // ══════════════════════════════════════════════════════
 function loadNotes() {
@@ -896,7 +924,7 @@ window.addEventListener('load', () => {
       document.getElementById('main-page').style.display = 'block';
       document.getElementById('config-banner').classList.add('show');
       document.getElementById('config-banner').textContent = '⚠ Google Identity Services kon niet laden. Controleer je internetverbinding.';
-      loadWeather(); loadNotes(); startClock();
+      loadWeather(); loadNotes(); loadJonaSchedule(); startClock();
     }
   }, 5000);
 });
