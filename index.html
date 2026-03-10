@@ -293,36 +293,42 @@ body::before {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 10px 12px;
+  padding: 14px 14px 0;
+  display: flex;
+  flex-direction: column;
 }
 .weather-block-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.weather-block-time {
-  font-family: var(--mono);
-  font-size: 16px;
-  font-weight: 400;
-  color: var(--text);
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 .weather-block-temp {
   font-family: var(--mono);
   font-size: 25px;
   font-weight: 400;
   color: var(--text);
-  text-align: right;
+  line-height: 1;
+}
+.weather-block-condition {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--text-muted);
+}
+#weather-detail {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 .weather-row {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
-  padding: 5px 0;
-  border-bottom: 1px solid var(--border);
+  flex: 1;
+  border-top: 1px solid var(--border);
+  padding: 10px 0;
 }
-.weather-row:last-child { border-bottom: none; }
 .weather-row-label { font-size: 15px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 .weather-row-val { font-family: var(--mono); font-size: 15px; font-weight: 400; text-align: right; }
 
@@ -514,6 +520,8 @@ body::before {
         <div class="weather-block">
           <div class="weather-block-header">
             <span class="weather-block-temp" id="weather-temp-block">—</span>
+            <span class="weather-block-condition"> — </span>
+            <span class="weather-block-condition" id="weather-condition"></span>
           </div>
           <div id="weather-detail"><div class="skel"></div><div class="skel" style="width:70%"></div></div>
         </div>
@@ -659,16 +667,14 @@ async function loadWeather() {
     const c = d.current;
     const code = c.weathercode;
 
-    // Weather block header
     document.getElementById('weather-temp-block').textContent = Math.round(c.temperature_2m) + '°C';
+    document.getElementById('weather-condition').textContent = WMO_CODES[code] || '';
 
-    // Detail
     const maxTemp = Math.max(...d.hourly.temperature_2m.slice(0,24));
     const minTemp = Math.min(...d.hourly.temperature_2m.slice(0,24));
     const maxRain = Math.max(...d.hourly.precipitation_probability.slice(0,24));
 
     document.getElementById('weather-detail').innerHTML = `
-      <div class="weather-row"><span class="weather-row-label">Actueel</span><span class="weather-row-val">${WMO_CODES[code]||''}</span></div>
       <div class="weather-row"><span class="weather-row-label">Min / Max</span><span class="weather-row-val">${Math.round(minTemp)}° / ${Math.round(maxTemp)}°</span></div>
       <div class="weather-row"><span class="weather-row-label">Wind</span><span class="weather-row-val">${Math.round(c.windspeed_10m)} km/u</span></div>
       <div class="weather-row"><span class="weather-row-label">Luchtvochtigheid</span><span class="weather-row-val">${c.relativehumidity_2m}%</span></div>
