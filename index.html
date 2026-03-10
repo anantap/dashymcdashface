@@ -231,9 +231,7 @@ body::before {
   flex-shrink: 0;
 }
 .dot-unread { background: var(--accent); }
-.dot-package { background: var(--accent2); }
 .dot-calendar { background: var(--blue); }
-.dot-read { background: var(--border); }
 
 .mail-body { flex: 1; min-width: 0; }
 .mail-from { font-weight: 500; font-size: 12px; }
@@ -246,27 +244,10 @@ body::before {
   border-radius: 2px;
   margin-top: 3px;
 }
-.tag-package { background: #1a3d25; color: var(--accent2); }
 .tag-calendar { background: #1a2d5a; color: var(--blue); }
 .tag-action { background: #3d2500; color: #f07030; }
 
 .mail-time { font-family: var(--mono); font-size: 10px; color: var(--text-dim); white-space: nowrap; }
-
-/* ── PACKAGES ── */
-.pkg-item {
-  display: flex;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  align-items: center;
-}
-.pkg-item:last-child { border-bottom: none; }
-
-.pkg-icon { font-size: 16px; }
-.pkg-body { flex: 1; min-width: 0; }
-.pkg-sender { font-weight: 500; font-size: 12px; }
-.pkg-status { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pkg-eta { font-family: var(--mono); font-size: 10px; color: var(--accent2); font-weight: 500; }
 
 /* ── HUCKLEBERRY ── */
 .huck-grid {
@@ -584,16 +565,7 @@ body::before {
         <div id="mail-list"><div class="skel"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:90%"></div></div>
       </div>
 
-      <!-- PACKAGES -->
-      <div class="section">
-        <div class="section-head">
-          Pakketten onderweg
-          <span class="section-count" id="pkg-count">—</span>
-        </div>
-        <div id="pkg-list"><div class="skel"></div><div class="skel" style="width:75%"></div></div>
-      </div>
-
-      <!-- FEEEED FEEDS -->
+      <!-- FEEEED
       <div class="section">
         <div class="section-head">
           Feeds
@@ -630,7 +602,7 @@ const CONFIG = {
   // Huckleberry bridge (jouw PC Stick thuis)
   // Als je thuis bent: 'http://192.168.x.x:PORT'
   // Als je extern bent: leeg laten of via ngrok/cloudflared tunnel
-  HUCKLEBERRY_URL: '',
+  HUCKLEBERRY_URL: 'http://192.168.178.252:3000',
 
 };
 
@@ -807,7 +779,6 @@ async function loadCalendar() {
 // ══════════════════════════════════════════════════════
 //  GMAIL
 // ══════════════════════════════════════════════════════
-const PACKAGE_SENDERS = ['postnl','dhl','dpd','fedex','ups','bol.com','amazon','coolblue','sendcloud','myparcel','trunkrs'];
 const CALENDAR_SUBJECTS = ['uitnodiging','invitation','accepted','declined','geaccepteerd','geweigerd','bijgewerkt','updated','cancelled','geannuleerd'];
 
 function timeAgo(dateMs) {
@@ -838,7 +809,6 @@ async function loadMail() {
       )
     );
 
-    const packages = [];
     const mailItems = [];
 
     details.filter(Boolean).forEach(msg => {
@@ -852,22 +822,16 @@ async function loadMail() {
       const subLower = subject.toLowerCase();
 
       // Classify
-      const isPkg = PACKAGE_SENDERS.some(s => fromLower.includes(s));
       const isCal = CALENDAR_SUBJECTS.some(s => subLower.startsWith(s));
       const isAction = /actie|feedback|review|kun jij|kan jij|could you|please|verzoek/i.test(subject + ' ' + from);
 
       const fromName = from.replace(/<.*>/,'').trim().replace(/"/g,'') || from.split('@')[0];
 
-      if (isPkg) {
-        packages.push({ from: fromName, subject, date });
-      }
-
       let tag = '';
-      if (isPkg) tag = '<span class="mail-tag tag-package">📦 pakket</span>';
-      else if (isCal) tag = '<span class="mail-tag tag-calendar">📅 agenda</span>';
+      if (isCal) tag = '<span class="mail-tag tag-calendar">📅 agenda</span>';
       else if (isAction) tag = '<span class="mail-tag tag-action">⚡ actie</span>';
 
-      const dotClass = isPkg ? 'dot-package' : isCal ? 'dot-calendar' : 'dot-unread';
+      const dotClass = isCal ? 'dot-calendar' : 'dot-unread';
 
       mailItems.push(`<div class="mail-item">
         <div class="mail-dot ${dotClass}"></div>
@@ -881,22 +845,6 @@ async function loadMail() {
     });
 
     el.innerHTML = mailItems.join('') || '<div class="empty">Alles gelezen</div>';
-
-    // Packages from mail
-    const pkgEl = document.getElementById('pkg-list');
-    document.getElementById('pkg-count').textContent = packages.length;
-    if (packages.length) {
-      pkgEl.innerHTML = packages.map(p => `<div class="pkg-item">
-        <div class="pkg-icon">📦</div>
-        <div class="pkg-body">
-          <div class="pkg-sender">${p.from}</div>
-          <div class="pkg-status">${p.subject}</div>
-        </div>
-        <div class="pkg-eta">${timeAgo(p.date)}</div>
-      </div>`).join('');
-    } else {
-      pkgEl.innerHTML = '<div class="empty">Geen pakketten gevonden in mail</div>';
-    }
 
   } catch(e) {
     el.innerHTML = `<div class="empty">Fout: ${e.message}</div>`;
