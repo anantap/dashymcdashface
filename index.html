@@ -557,14 +557,8 @@ const CONFIG = {
 let googleAccessToken = null;
 let tokenClient;
 let dashboardLoaded = false;
-
-function scheduleTokenRefresh(expiryMs) {
-  // Refresh 5 minutes before expiry
-  const delay = expiryMs - Date.now() - 5 * 60 * 1000;
-  if (delay > 0) {
-    setTimeout(() => tokenClient.requestAccessToken({ prompt: '' }), delay);
-  }
-}
+let tokenRefreshPromise = null;
+let tokenRefreshResolve = null;
 
 function initGoogleAuth() {
   tokenClient = google.accounts.oauth2.initTokenClient({
@@ -576,18 +570,20 @@ function initGoogleAuth() {
         const expiry = Date.now() + (resp.expires_in || 3600) * 1000;
         localStorage.setItem('goog-token', resp.access_token);
         localStorage.setItem('goog-token-expiry', String(expiry));
-        scheduleTokenRefresh(expiry);
+        if (tokenRefreshResolve) {
+          tokenRefreshResolve(resp.access_token);
+          tokenRefreshResolve = null;
+        }
         if (!dashboardLoaded) onAuthenticated();
       }
     }
   });
 
-  // Use cached token if still valid
+  // Use cached token if still valid (>1 min remaining)
   const savedToken = localStorage.getItem('goog-token');
   const savedExpiry = parseInt(localStorage.getItem('goog-token-expiry') || '0');
   if (savedToken && savedExpiry > Date.now() + 60000) {
     googleAccessToken = savedToken;
-    scheduleTokenRefresh(savedExpiry);
     onAuthenticated();
     return;
   }
@@ -595,10 +591,25 @@ function initGoogleAuth() {
   // Try silent re-auth first; only show login screen if it fails
   tokenClient.requestAccessToken({ prompt: '' });
   setTimeout(() => {
-    if (!dashboardLoaded) {
-      document.getElementById('auth-screen').style.display = 'flex';
-    }
+    if (!dashboardLoaded) document.getElementById('auth-screen').style.display = 'flex';
   }, 3000);
+}
+
+// Called before every API request — refreshes silently if token is expired or close to it
+function ensureValidToken() {
+  const expiry = parseInt(localStorage.getItem('goog-token-expiry') || '0');
+  if (googleAccessToken && expiry > Date.now() + 60000) {
+    return Promise.resolve(googleAccessToken);
+  }
+  if (tokenRefreshPromise) return tokenRefreshPromise;
+  tokenRefreshPromise = new Promise(resolve => {
+    tokenRefreshResolve = token => {
+      tokenRefreshPromise = null;
+      resolve(token);
+    };
+    tokenClient.requestAccessToken({ prompt: '' });
+  });
+  return tokenRefreshPromise;
 }
 
 function signInWithGoogle() {
@@ -624,16 +635,18 @@ function signOut() {
 }
 
 async function gapi(path) {
+  const token = await ensureValidToken();
   const resp = await fetch('https://www.googleapis.com/gmail/v1' + path, {
-    headers: { Authorization: 'Bearer ' + googleAccessToken }
+    headers: { Authorization: 'Bearer ' + token }
   });
   if (!resp.ok) throw new Error(resp.status);
   return resp.json();
 }
 
 async function gcal(path) {
+  const token = await ensureValidToken();
   const resp = await fetch('https://www.googleapis.com/calendar/v3' + path, {
-    headers: { Authorization: 'Bearer ' + googleAccessToken }
+    headers: { Authorization: 'Bearer ' + token }
   });
   if (!resp.ok) throw new Error(resp.status);
   return resp.json();
@@ -830,9 +843,10 @@ async function loadMail() {
 }
 
 async function gapiPost(path, body) {
+  const token = await ensureValidToken();
   const resp = await fetch('https://www.googleapis.com/gmail/v1' + path, {
     method: 'POST',
-    headers: { Authorization: 'Bearer ' + googleAccessToken, 'Content-Type': 'application/json' },
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   if (resp.status === 403 || resp.status === 401) {
