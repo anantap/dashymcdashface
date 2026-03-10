@@ -145,7 +145,22 @@ body::before {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.col-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.col-right .section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.col-right .weather-block {
+  flex: 1;
 }
 
 /* ── SECTION ── */
@@ -489,8 +504,8 @@ body::before {
       </div>
     </div>
 
-    <!-- RIGHT COL: Weather + Inbox -->
-    <div>
+    <!-- RIGHT COL: Weather -->
+    <div class="col-right">
       <!-- WEATHER -->
       <div class="section">
         <div class="weather-block">
