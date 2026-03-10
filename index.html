@@ -918,6 +918,14 @@ async function gapiPost(path, body) {
     headers: { Authorization: 'Bearer ' + googleAccessToken, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
+  if (resp.status === 403 || resp.status === 401) {
+    // Token lacks required scope — clear it and re-authenticate
+    localStorage.removeItem('goog-token');
+    localStorage.removeItem('goog-token-expiry');
+    googleAccessToken = null;
+    tokenClient.requestAccessToken();
+    throw new Error('Opnieuw inloggen vereist voor deze actie.');
+  }
   if (!resp.ok) throw new Error(resp.status);
   return resp.json();
 }
