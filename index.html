@@ -324,73 +324,53 @@ body::before {
 .section:nth-child(3) { animation-delay: 0.15s; }
 .section:nth-child(4) { animation-delay: 0.2s; }
 
-/* ── CAROUSEL ── */
-.carousel-wrap {
-  overflow: hidden;
-}
-.carousel-track {
-  display: flex;
-  transition: transform 0.35s ease;
-}
-.carousel-page {
-  min-width: 100%;
+/* ── TRAM ── */
+.tram-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 12px;
-  align-items: start;
+  margin-bottom: 8px;
 }
-.carousel-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 10px 12px;
-}
-.carousel-source {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  margin-bottom: 5px;
+.tram-stop-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-.carousel-card a {
   font-family: var(--mono);
-  font-size: 14px;
-  color: var(--text);
-  text-decoration: none;
-  line-height: 1.4;
-  display: block;
+  font-size: 12px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
 }
-.carousel-card a:hover { color: var(--text-muted); }
-.carousel-nav {
+.tram-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-.carousel-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-family: var(--mono);
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid var(--border);
   font-size: 14px;
-  padding: 1px 7px;
-  border-radius: var(--r);
-  transition: all 0.15s;
-  line-height: 1.4;
 }
-.carousel-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
-.carousel-btn:disabled { opacity: 0.25; cursor: default; }
-.carousel-pos {
-  font-size: 12px;
-  color: var(--text-dim);
-  min-width: 36px;
+.tram-line {
+  background: var(--border);
+  border-radius: 3px;
+  padding: 1px 6px;
+  min-width: 28px;
   text-align: center;
+  font-size: 13px;
+  color: var(--text);
+  flex-shrink: 0;
 }
-.feed-delete {
+.tram-dest { flex: 1; color: var(--text); }
+.tram-time { color: var(--text-muted); white-space: nowrap; }
+.tram-time.soon { color: var(--text); }
+.tram-updated {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-weight: normal;
+}
+.stop-delete {
   display: inline;
   background: transparent;
   border: none;
@@ -402,18 +382,15 @@ body::before {
   transition: color 0.15s;
   line-height: 1;
 }
-.feed-delete:hover { color: var(--accent); }
+.stop-delete:hover { color: var(--accent); }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 900px) {
-  .carousel-page { grid-template-columns: repeat(2, 1fr); }
-}
 @media (max-width: 640px) {
   .page { padding: 0 16px 32px; }
   .masthead { padding: 14px 0 10px; }
   .clock { font-size: 22px; }
   .grid { grid-template-columns: 1fr; }
-  .carousel-page { grid-template-columns: 1fr; }
+  .tram-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -471,26 +448,17 @@ body::before {
 
   </div><!-- /grid -->
 
-  <!-- CAROUSEL -->
+  <!-- TRAM DEPARTURES -->
   <div>
     <div class="section-head" style="margin-bottom:12px;">
-      <span>Feeds</span>
-      <div class="carousel-nav">
-        <button class="carousel-btn" id="carousel-prev" onclick="carouselNav(-1)">←</button>
-        <span class="carousel-pos" id="carousel-pos"></span>
-        <button class="carousel-btn" id="carousel-next" onclick="carouselNav(1)">→</button>
-      </div>
+      <span>Vertrekken</span>
+      <span class="tram-updated" id="tram-updated"></span>
     </div>
-    <div class="carousel-wrap">
-      <div class="carousel-track" id="carousel-track"></div>
-    </div>
-    <div class="edit-form" id="rss-form" style="margin-top:12px;">
-      <input class="edit-input" id="rss-name" placeholder="Feed naam" style="width:120px">
-      <input class="edit-input" id="rss-url" placeholder="Feed URL" style="width:220px">
-      <button class="btn-small" onclick="addFeed()">+ RSS</button>
-      <label class="btn-small" style="cursor:pointer;">OPML<input type="file" accept=".opml,.xml" style="display:none" onchange="importOpml(event)"></label>
-      <input class="edit-input" id="reddit-sub" placeholder="Subreddit" style="width:140px; margin-left:8px;">
-      <button class="btn-small" onclick="addSubreddit()">+ Reddit</button>
+    <div class="tram-grid" id="tram-grid"></div>
+    <div class="edit-form" style="margin-top:12px;">
+      <input class="edit-input" id="stop-code" placeholder="Stopcode (bijv. DHL)" style="width:190px" onkeydown="if(event.key==='Enter')addStop()">
+      <input class="edit-input" id="stop-label" placeholder="Naam (optioneel)" style="width:160px" onkeydown="if(event.key==='Enter')addStop()">
+      <button class="btn-small" onclick="addStop()">+ Halte</button>
     </div>
   </div>
 
@@ -675,252 +643,126 @@ function deleteQuicklink(idx) {
 }
 
 // ══════════════════════════════════════════════════════
-//  RSS FEEDS
+//  TRAM DEPARTURES — OVapi (v0.ovapi.nl)
 // ══════════════════════════════════════════════════════
-function getFeeds() {
-  return lsGet('dmdf-rss-feeds', []);
+function getStops() { return lsGet('dmdf-tram-stops', []); }
+function saveStops(s) { lsSet('dmdf-tram-stops', s); }
+
+async function fetchDepartures(code) {
+  const url = `https://v0.ovapi.nl/stopareacode/${encodeURIComponent(code)}/departures`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return resp.json();
 }
 
-function saveFeeds(feeds) {
-  lsSet('dmdf-rss-feeds', feeds);
-}
-
-async function fetchFeed(feed) {
-  const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feed.url);
-  const resp = await fetch(proxyUrl);
-  const text = await resp.text();
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(text, 'text/xml');
-  const items = Array.from(xml.querySelectorAll('item')).slice(0, 5);
-
-  return items.map(item => {
-    const title = item.querySelector('title') ? item.querySelector('title').textContent.trim() : '(geen titel)';
-    let link = '';
-    const linkEl = item.querySelector('link');
-    if (linkEl) {
-      link = linkEl.textContent.trim() || linkEl.getAttribute('href') || '';
-    }
-    if (!link) {
-      const guidEl = item.querySelector('guid');
-      if (guidEl) link = guidEl.textContent.trim();
-    }
-    return { title, link };
+function parseDepartures(data) {
+  const now = new Date();
+  const deps = [];
+  Object.values(data).forEach(tpc => {
+    const stopName = tpc.Stop?.TimingPointName || '';
+    Object.values(tpc.Passes || {}).forEach(pass => {
+      const t = pass.ExpectedDepartureTime || pass.TargetDepartureTime;
+      if (!t) return;
+      const dt = new Date(t);
+      if (dt < now) return;
+      deps.push({
+        line: pass.LinePublicNumber || '?',
+        dest: pass.DestinationName50 || '',
+        time: dt,
+        stopName
+      });
+    });
   });
+  deps.sort((a, b) => a.time - b.time);
+  return deps.slice(0, 8);
 }
 
-function addFeed() {
-  const nameEl = document.getElementById('rss-name');
-  const urlEl  = document.getElementById('rss-url');
-  const name = nameEl.value.trim();
-  const url  = urlEl.value.trim();
-  if (!name || !url) return;
-
-  const feeds = getFeeds();
-  feeds.push({ name, url });
-  saveFeeds(feeds);
-  nameEl.value = '';
-  urlEl.value = '';
-  loadCarousel();
+function fmtMin(dt) {
+  const m = Math.round((dt - new Date()) / 60000);
+  if (m <= 0) return 'nu';
+  return m + '\u202fmin';
 }
 
-function deleteFeed(idx) {
-  const feeds = getFeeds();
-  feeds.splice(idx, 1);
-  saveFeeds(feeds);
-  loadCarousel();
-}
+async function loadTram() {
+  const stops = getStops();
+  const grid = document.getElementById('tram-grid');
+  grid.innerHTML = '';
 
-// ══════════════════════════════════════════════════════
-//  SUBREDDITS
-// ══════════════════════════════════════════════════════
-function getSubreddits() {
-  return lsGet('dmdf-subreddits', []);
-}
-
-function saveSubreddits(subs) {
-  lsSet('dmdf-subreddits', subs);
-}
-
-async function fetchSubreddit(sub) {
-  const url = `https://www.reddit.com/r/${sub}/hot.json?limit=5`;
-  const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
-  const data = await resp.json();
-  return data.data.children.slice(0, 5).map(c => ({
-    title: c.data.title,
-    permalink: c.data.permalink
-  }));
-}
-
-function addSubreddit() {
-  const subEl = document.getElementById('reddit-sub');
-  const sub = subEl.value.trim().replace(/^r\//i, '');
-  if (!sub) return;
-  const subs = getSubreddits();
-  subs.push(sub);
-  saveSubreddits(subs);
-  subEl.value = '';
-  loadCarousel();
-}
-
-function deleteSubreddit(idx) {
-  const subs = getSubreddits();
-  subs.splice(idx, 1);
-  saveSubreddits(subs);
-  loadCarousel();
-}
-
-// ══════════════════════════════════════════════════════
-//  CAROUSEL
-// ══════════════════════════════════════════════════════
-const ITEMS_PER_PAGE = 4;
-let carouselPages = [];
-let carouselCurrent = 0;
-
-async function loadCarousel() {
-  const track = document.getElementById('carousel-track');
-  track.style.transition = 'none';
-  track.innerHTML = '<div style="padding:14px 0;color:var(--text-dim);font-size:14px;">Laden…</div>';
-
-  const feeds = getFeeds();
-  const subs  = getSubreddits();
-  const allItems = [];
-
-  await Promise.allSettled([
-    ...feeds.map(async (feed, fi) => {
-      try {
-        const items = await fetchFeed(feed);
-        items.forEach(item => allItems.push({
-          source: feed.name,
-          title: item.title,
-          url: item.link || '#',
-          feedIdx: fi,
-          type: 'rss'
-        }));
-      } catch(e) {}
-    }),
-    ...subs.map(async (sub, si) => {
-      try {
-        const posts = await fetchSubreddit(sub);
-        posts.forEach(post => allItems.push({
-          source: 'r/' + sub,
-          title: post.title,
-          url: 'https://reddit.com' + post.permalink,
-          subIdx: si,
-          type: 'reddit'
-        }));
-      } catch(e) {}
-    })
-  ]);
-
-  renderCarousel(allItems);
-}
-
-function renderCarousel(items) {
-  const track = document.getElementById('carousel-track');
-  track.style.transition = 'none';
-  track.innerHTML = '';
-  carouselPages = [];
-  carouselCurrent = 0;
-
-  if (items.length === 0) {
-    track.innerHTML = '<div style="padding:14px 0;color:var(--text-dim);font-size:14px;">Geen feeds ingesteld — voeg een RSS feed of subreddit toe.</div>';
-    document.getElementById('carousel-pos').textContent = '';
-    document.getElementById('carousel-prev').disabled = true;
-    document.getElementById('carousel-next').disabled = true;
+  if (stops.length === 0) {
+    grid.innerHTML = '<div style="color:var(--text-dim);font-size:14px;padding:4px 0;">Geen haltes — voeg een stopcode toe.</div>';
     return;
   }
 
-  for (let i = 0; i < items.length; i += ITEMS_PER_PAGE) {
-    carouselPages.push(items.slice(i, i + ITEMS_PER_PAGE));
-  }
+  await Promise.allSettled(stops.map(async (stop, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
 
-  const feeds = getFeeds();
-  const subs  = getSubreddits();
+    const head = document.createElement('div');
+    head.className = 'tram-stop-head';
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = stop.label || stop.code;
+    head.appendChild(nameSpan);
 
-  carouselPages.forEach(page => {
-    const pageEl = document.createElement('div');
-    pageEl.className = 'carousel-page';
-    page.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'carousel-card';
+    const del = document.createElement('button');
+    del.className = 'stop-delete';
+    del.textContent = '✕';
+    del.onclick = () => deleteStop(i);
+    head.appendChild(del);
 
-      const src = document.createElement('div');
-      src.className = 'carousel-source';
-      src.appendChild(document.createTextNode(item.source));
+    const body = document.createElement('div');
 
-      const del = document.createElement('button');
-      del.className = 'feed-delete';
-      del.textContent = '✕';
-      del.title = item.type === 'rss'
-        ? `Verwijder feed "${feeds[item.feedIdx]?.name}"`
-        : `Verwijder r/${subs[item.subIdx]}`;
-      del.onclick = item.type === 'rss'
-        ? () => deleteFeed(item.feedIdx)
-        : () => deleteSubreddit(item.subIdx);
-      src.appendChild(del);
-
-      const a = document.createElement('a');
-      a.href = item.url;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.textContent = item.title;
-
-      card.appendChild(src);
-      card.appendChild(a);
-      pageEl.appendChild(card);
-    });
-    track.appendChild(pageEl);
-  });
-
-  updateCarouselPos();
-}
-
-function updateCarouselPos() {
-  const track = document.getElementById('carousel-track');
-  track.style.transition = 'transform 0.35s ease';
-  track.style.transform = `translateX(${-carouselCurrent * 100}%)`;
-  const total = carouselPages.length;
-  document.getElementById('carousel-pos').textContent = total > 0 ? `${carouselCurrent + 1} / ${total}` : '';
-  document.getElementById('carousel-prev').disabled = carouselCurrent === 0;
-  document.getElementById('carousel-next').disabled = carouselCurrent >= total - 1;
-}
-
-function carouselNav(dir) {
-  carouselCurrent = Math.max(0, Math.min(carouselPages.length - 1, carouselCurrent + dir));
-  updateCarouselPos();
-}
-
-// ══════════════════════════════════════════════════════
-//  OPML IMPORT
-// ══════════════════════════════════════════════════════
-function importOpml(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(e.target.result, 'text/xml');
-    const outlines = Array.from(xml.querySelectorAll('outline[xmlUrl]'));
-    if (outlines.length === 0) {
-      alert('Geen RSS feeds gevonden in dit OPML bestand.');
-      return;
-    }
-    const feeds = getFeeds();
-    let added = 0;
-    outlines.forEach(o => {
-      const url = o.getAttribute('xmlUrl');
-      const name = o.getAttribute('title') || o.getAttribute('text') || url;
-      if (url && !feeds.find(f => f.url === url)) {
-        feeds.push({ name, url });
-        added++;
+    try {
+      const data = await fetchDepartures(stop.code);
+      const deps = parseDepartures(data);
+      if (deps.length === 0) {
+        body.innerHTML = '<div style="color:var(--text-dim);font-size:14px;padding:6px 0;">Geen vertrekken.</div>';
+      } else {
+        if (!stop.label && deps[0].stopName) nameSpan.textContent = deps[0].stopName;
+        deps.forEach(dep => {
+          const mins = Math.round((dep.time - new Date()) / 60000);
+          const row = document.createElement('div');
+          row.className = 'tram-row';
+          row.innerHTML = `
+            <span class="tram-line">${dep.line}</span>
+            <span class="tram-dest">${dep.dest}</span>
+            <span class="tram-time${mins <= 2 ? ' soon' : ''}">${fmtMin(dep.time)}</span>
+          `;
+          body.appendChild(row);
+        });
       }
-    });
-    saveFeeds(feeds);
-    loadCarousel();
-    event.target.value = '';
-    if (added > 0) alert(`${added} feed(s) toegevoegd.`);
-  };
-  reader.readAsText(file);
+    } catch(e) {
+      body.innerHTML = '<div style="color:var(--text-dim);font-size:14px;padding:6px 0;">Niet bereikbaar.</div>';
+    }
+
+    card.appendChild(head);
+    card.appendChild(body);
+    grid.appendChild(card);
+  }));
+
+  const now = new Date();
+  document.getElementById('tram-updated').textContent =
+    `bijgewerkt ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+function addStop() {
+  const codeEl  = document.getElementById('stop-code');
+  const labelEl = document.getElementById('stop-label');
+  const code  = codeEl.value.trim().toUpperCase();
+  const label = labelEl.value.trim();
+  if (!code) return;
+  const stops = getStops();
+  stops.push({ code, label });
+  saveStops(stops);
+  codeEl.value = '';
+  labelEl.value = '';
+  loadTram();
+}
+
+function deleteStop(idx) {
+  const stops = getStops();
+  stops.splice(idx, 1);
+  saveStops(stops);
+  loadTram();
 }
 
 // ══════════════════════════════════════════════════════
@@ -931,7 +773,8 @@ window.addEventListener('load', () => {
   loadWeather();
   loadJonaSchedule();
   renderQuicklinks();
-  loadCarousel();
+  loadTram();
+  setInterval(loadTram, 30000);
 });
 </script>
 </body>
