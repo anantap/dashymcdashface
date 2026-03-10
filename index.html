@@ -463,7 +463,7 @@ body::before {
 <body>
 
 <!-- AUTH SCREEN -->
-<div id="auth-screen" class="auth-screen">
+<div id="auth-screen" class="auth-screen" style="display:none">
   <div class="auth-card">
     <div class="auth-card-title">Goedemorgen</div>
     <div class="auth-card-sub">Log in met je Google-account om je dashboard te laden.</div>
@@ -556,26 +556,17 @@ const CONFIG = {
 // ══════════════════════════════════════════════════════
 let googleAccessToken = null;
 let tokenClient;
+let dashboardLoaded = false;
+
+function scheduleTokenRefresh(expiryMs) {
+  // Refresh 5 minutes before expiry
+  const delay = expiryMs - Date.now() - 5 * 60 * 1000;
+  if (delay > 0) {
+    setTimeout(() => tokenClient.requestAccessToken({ prompt: '' }), delay);
+  }
+}
 
 function initGoogleAuth() {
-  if (CONFIG.GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('main-page').style.display = 'block';
-    document.getElementById('config-banner').classList.add('show');
-    loadWeather(); loadHuckleberry(); loadNotes(); loadJonaSchedule();
-    startClock();
-    return;
-  }
-
-  // Restore saved token if still valid (>1 min remaining)
-  const savedToken = localStorage.getItem('goog-token');
-  const savedExpiry = parseInt(localStorage.getItem('goog-token-expiry') || '0');
-  if (savedToken && savedExpiry > Date.now() + 60000) {
-    googleAccessToken = savedToken;
-    onAuthenticated();
-    return;
-  }
-
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.GOOGLE_CLIENT_ID,
     scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.modify',
@@ -585,17 +576,37 @@ function initGoogleAuth() {
         const expiry = Date.now() + (resp.expires_in || 3600) * 1000;
         localStorage.setItem('goog-token', resp.access_token);
         localStorage.setItem('goog-token-expiry', String(expiry));
-        onAuthenticated();
+        scheduleTokenRefresh(expiry);
+        if (!dashboardLoaded) onAuthenticated();
       }
     }
   });
+
+  // Use cached token if still valid
+  const savedToken = localStorage.getItem('goog-token');
+  const savedExpiry = parseInt(localStorage.getItem('goog-token-expiry') || '0');
+  if (savedToken && savedExpiry > Date.now() + 60000) {
+    googleAccessToken = savedToken;
+    scheduleTokenRefresh(savedExpiry);
+    onAuthenticated();
+    return;
+  }
+
+  // Try silent re-auth first; only show login screen if it fails
+  tokenClient.requestAccessToken({ prompt: '' });
+  setTimeout(() => {
+    if (!dashboardLoaded) {
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+  }, 3000);
 }
 
 function signInWithGoogle() {
-  tokenClient.requestAccessToken();
+  tokenClient.requestAccessToken({ prompt: 'consent' });
 }
 
 function onAuthenticated() {
+  dashboardLoaded = true;
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('main-page').style.display = 'block';
   startClock();
