@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,17 +24,16 @@
 
 body {
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-muted);
   font-family: var(--mono);
   font-size: 18px;
-  line-height: 1.55;
+  line-height: 1.7;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ── GRAIN OVERLAY ── */
 body::before {
   content: '';
   position: fixed;
@@ -45,736 +44,174 @@ body::before {
   opacity: 0.4;
 }
 
-/* ── LAYOUT ── */
-.page { position: relative; z-index: 1; width: 100%; max-width: 1280px; padding: 32px 24px; }
-
-/* ── MASTHEAD ── */
-.masthead {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0 12px;
-  border-bottom: 2px solid var(--text);
-  margin-bottom: 20px;
-}
-
-.masthead-date {
-  font-family: var(--mono);
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.masthead-right {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* ── CLOCK ── */
-.clock {
-  font-family: var(--mono);
-  font-size: 30px;
-  font-weight: 300;
-  letter-spacing: 0.04em;
-  color: var(--text);
-  line-height: 1;
-}
-
-.btn-small {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 3px 8px;
-  cursor: pointer;
-  border-radius: var(--r);
-  transition: all 0.15s;
-}
-.btn-small:hover { border-color: var(--text); color: var(--text); }
-
-/* ── QUICKLINKS ── */
-.quicklinks-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-  align-items: center;
-}
-
-.quicklink-pill {
+.page {
   position: relative;
-  display: inline-block;
+  z-index: 1;
+  width: 100%;
+  max-width: 680px;
+  padding: 48px 24px;
 }
 
-.quicklink-pill a {
-  display: inline-block;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 6px 14px;
-  font-family: var(--mono);
-  font-size: 14px;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color 0.15s, border-color 0.15s;
-  white-space: nowrap;
-}
-.quicklink-pill a:hover { color: var(--text); border-color: var(--text-muted); }
-
-.item-delete {
-  display: block;
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: none;
-  color: #fff;
-  font-size: 10px;
-  line-height: 16px;
-  text-align: center;
-  cursor: pointer;
-  padding: 0;
-  font-family: var(--mono);
-  z-index: 2;
-}
-/* ── EDIT FORMS ── */
-.edit-form {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
-
-.edit-input {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 5px 10px;
-  font-family: var(--mono);
-  font-size: 13px;
+.greeting {
+  font-size: 32px;
+  font-weight: 300;
   color: var(--text);
-  outline: none;
-  transition: border-color 0.15s;
+  margin-bottom: 28px;
+  letter-spacing: 0.02em;
 }
-.edit-input:focus { border-color: var(--text-muted); }
-.edit-input::placeholder { color: var(--text-dim); }
 
-/* ── GRID ── */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-items: stretch;
+.line {
+  margin-bottom: 6px;
+}
+
+.hi {
+  color: var(--text);
+}
+
+.prompt {
+  margin-top: 40px;
   margin-bottom: 20px;
 }
 
-.col-left, .col-right {
+.actions {
   display: flex;
-  flex-direction: column;
-}
-
-.col-left .section, .col-right .section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.col-left #jona-schedule, .col-right .weather-block {
-  flex: 1;
-}
-
-#jona-schedule {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-}
-.jona-row {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 12px;
-  border-top: 1px solid var(--border);
-}
-.jona-row:first-child { border-top: none; }
-
-/* ── SECTION ── */
-.section { margin-bottom: 20px; }
-
-.section-head {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* ── CARD ── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 10px 12px;
-}
-
-.card-label {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.card-value {
-  font-family: var(--mono);
-  font-size: 25px;
-  font-weight: 400;
-  color: var(--text);
-}
-
-.card-sub {
-  font-family: var(--mono);
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-/* ── WEATHER ── */
-.weather-block {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 14px 14px 0;
-  display: flex;
-  flex-direction: column;
-}
-.weather-block-header {
-  display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 14px;
 }
-.weather-block-temp {
-  font-family: var(--mono);
-  font-size: 25px;
-  font-weight: 400;
-  color: var(--text);
-  line-height: 1;
-}
-.weather-block-condition {
+
+.action-btn {
+  display: inline-block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 18px;
   font-family: var(--mono);
   font-size: 15px;
   color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
 }
-#weather-detail {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+.action-btn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
 }
-.weather-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-  border-top: 1px solid var(--border);
-  padding: 10px 0;
-}
-.weather-row-label { font-size: 15px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
-.weather-row-val { font-family: var(--mono); font-size: 15px; font-weight: 400; text-align: right; }
 
-
-/* ── SKELETON ── */
 .skel {
+  display: inline-block;
+  width: 80px;
+  height: 13px;
   background: linear-gradient(90deg, var(--border) 25%, var(--bg2) 50%, var(--border) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite;
   border-radius: 3px;
-  height: 11px;
-  margin: 7px 0;
+  vertical-align: middle;
 }
+
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-/* ── ANIMATIONS ── */
-.fade-in { animation: fadeIn 0.4s ease forwards; opacity: 0; }
+.fade-in { animation: fadeIn 0.6s ease forwards; opacity: 0; }
 @keyframes fadeIn { to { opacity: 1; } }
 
-.section { animation: fadeIn 0.5s ease forwards; opacity: 0; }
-.section:nth-child(1) { animation-delay: 0.05s; }
-.section:nth-child(2) { animation-delay: 0.1s; }
-.section:nth-child(3) { animation-delay: 0.15s; }
-.section:nth-child(4) { animation-delay: 0.2s; }
-
-/* ── TRAM ── */
-.tram-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.tram-stop-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-.tram-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 0;
-  border-top: 1px solid var(--border);
-  font-size: 14px;
-}
-.tram-line {
-  background: var(--border);
-  border-radius: 3px;
-  padding: 1px 6px;
-  min-width: 28px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--text);
-  flex-shrink: 0;
-}
-.tram-dest { flex: 1; color: var(--text); }
-.tram-time { color: var(--text-muted); white-space: nowrap; }
-.tram-time.soon { color: var(--text); }
-.tram-updated {
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 0.04em;
-  text-transform: none;
-  font-weight: normal;
-}
-.stop-delete {
-  display: inline;
-  background: transparent;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 0;
-  transition: color 0.15s;
-  line-height: 1;
-}
-.stop-delete:hover { color: var(--accent); }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 640px) {
-  .page { padding: 0 16px 32px; }
-  .masthead { padding: 14px 0 10px; }
-  .clock { font-size: 22px; }
-  .grid { grid-template-columns: 1fr; }
-  .tram-grid { grid-template-columns: 1fr; }
+@media (max-width: 480px) {
+  .greeting { font-size: 24px; }
+  .page { padding: 32px 20px; }
 }
 </style>
 </head>
 <body>
-
-<div class="page">
-
-  <!-- MASTHEAD -->
-  <div class="masthead fade-in">
-    <div class="masthead-date" id="date-str"></div>
-    <div class="masthead-right">
-      <div class="clock" id="clock"></div>
-    </div>
-  </div>
-
-  <!-- QUICKLINKS ROW -->
-  <div class="quicklinks-row" id="quicklinks-row">
-    <div id="quicklinks-list" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;"></div>
-    <div class="edit-form" id="quicklinks-form">
-      <input class="edit-input" id="ql-name" placeholder="Naam" style="width:120px">
-      <input class="edit-input" id="ql-url" placeholder="URL" style="width:200px">
-      <button class="btn-small" onclick="addQuicklink()">Voeg toe</button>
-    </div>
-  </div>
-
-  <!-- MAIN GRID -->
-  <div class="grid">
-
-    <!-- LEFT COL -->
-    <div class="col-left">
-      <!-- Jona -->
-      <div class="section">
-        <div class="section-head">Jona</div>
-        <div id="jona-schedule" class="card">
-          <div class="card-label">Vandaag</div>
-          <div class="card-value">—</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- RIGHT COL: Weather -->
-    <div class="col-right">
-      <div class="section">
-        <div class="section-head">Weer</div>
-        <div class="weather-block">
-          <div class="weather-block-header">
-            <span class="weather-block-temp" id="weather-temp-block">—</span>
-            <span class="weather-block-condition" id="weather-condition"> — </span>
-          </div>
-          <div id="weather-detail"><div class="skel"></div><div class="skel" style="width:70%"></div></div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /grid -->
-
-  <!-- TRAM DEPARTURES -->
-  <div>
-    <div class="section-head" style="margin-bottom:12px;">
-      <span>Vertrekken</span>
-      <span class="tram-updated" id="tram-updated"></span>
-    </div>
-    <div class="tram-grid" id="tram-grid"></div>
-    <div class="edit-form" style="margin-top:12px;">
-      <input class="edit-input" id="stop-code" placeholder="Stopcode (bijv. DHL)" style="width:190px" onkeydown="if(event.key==='Enter')addStop()">
-      <input class="edit-input" id="stop-label" placeholder="Naam (optioneel)" style="width:160px" onkeydown="if(event.key==='Enter')addStop()">
-      <button class="btn-small" onclick="addStop()">+ Halte</button>
-    </div>
-  </div>
-
-</div><!-- /page -->
+<div class="page fade-in">
+  <div class="greeting" id="greeting"></div>
+  <div class="line" id="line-datetime"></div>
+  <div class="line" id="line-jona"></div>
+  <div class="line" id="line-weather"></div>
+  <div class="prompt">What would you like to do?</div>
+  <div class="actions" id="actions"></div>
+</div>
 
 <script>
 'use strict';
 
-// ══════════════════════════════════════════════════════
-//  CLOCK
-// ══════════════════════════════════════════════════════
-function startClock() {
-  const days = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
-  const months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-
-  function tick() {
-    const now = new Date();
-    const hh = String(now.getHours()).padStart(2,'0');
-    const mm = String(now.getMinutes()).padStart(2,'0');
-    const ss = String(now.getSeconds()).padStart(2,'0');
-    document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
-    document.getElementById('date-str').textContent =
-      `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-  }
-  tick();
-  setInterval(tick, 1000);
-}
-
-// ══════════════════════════════════════════════════════
-//  WEATHER — Open-Meteo (no API key)
-// ══════════════════════════════════════════════════════
-const WMO_CODES = {
-  0:'Helder',1:'Overwegend helder',2:'Gedeeltelijk bewolkt',3:'Bewolkt',
-  45:'Mist',48:'Rijpmist',51:'Lichte motregen',53:'Motregen',55:'Zware motregen',
-  61:'Lichte regen',63:'Regen',65:'Zware regen',71:'Lichte sneeuw',73:'Sneeuw',80:'Regenbuien',81:'Buien',95:'Onweer'
+const WMO = {
+  0:'clear',1:'mostly clear',2:'partly cloudy',3:'overcast',
+  45:'foggy',48:'foggy',51:'light drizzle',53:'drizzle',55:'heavy drizzle',
+  61:'light rain',63:'rain',65:'heavy rain',71:'light snow',73:'snow',
+  80:'rain showers',81:'showers',95:'thunderstorms'
 };
 
+const SCHEDULE = {
+  0:'Papadag', 1:'Papadag', 2:'Opa & Omadag', 3:'Mamadag', 4:'Crèche', 5:'Crèche', 6:'Papadag'
+};
+
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function hi(t) { return `<span class="hi">${t}</span>`; }
+
+function greeting(h) {
+  if (h >= 5 && h < 12) return 'Good morning!';
+  if (h >= 12 && h < 18) return 'Good afternoon!';
+  if (h >= 18 && h < 22) return 'Good evening!';
+  return 'Good night.';
+}
+
+function isDesktop() {
+  return window.innerWidth > 768 && !('ontouchstart' in window);
+}
+
+function tick() {
+  const now = new Date();
+  const h = now.getHours();
+  const time = `${String(h).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const dateStr = `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('greeting').textContent = greeting(h);
+  document.getElementById('line-datetime').innerHTML = `It's ${hi(dateStr)} — ${hi(time)}.`;
+}
+
+function loadJona() {
+  const activity = SCHEDULE[new Date().getDay()];
+  document.getElementById('line-jona').innerHTML = `Today is Jona's ${hi(activity)}.`;
+}
+
 async function loadWeather() {
+  const el = document.getElementById('line-weather');
+  el.innerHTML = `Outside: <span class="skel"></span>`;
   try {
-    const url = 'https://api.open-meteo.com/v1/forecast' +
+    const r = await fetch(
+      'https://api.open-meteo.com/v1/forecast' +
       '?latitude=52.0705&longitude=4.3007' +
-      '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m' +
-      '&hourly=temperature_2m,precipitation_probability,precipitation' +
-      '&forecast_days=1&timezone=Europe/Amsterdam';
-
-    const resp = await fetch(url);
-    const d = await resp.json();
-    const c = d.current;
-    const code = c.weathercode;
-
-    document.getElementById('weather-temp-block').textContent = Math.round(c.temperature_2m) + '°C';
-    document.getElementById('weather-condition').textContent = WMO_CODES[code] || '';
-
-    const maxTemp = Math.max(...d.hourly.temperature_2m.slice(0,24));
-    const minTemp = Math.min(...d.hourly.temperature_2m.slice(0,24));
-
-    const hourIdx = new Date().getHours();
-    const precip = d.hourly.precipitation || [];
-    const precipNext = (precip[hourIdx] || 0) + (precip[hourIdx + 1] || 0);
-    const precipStr = precipNext === 0 ? 'Droog' : '~' + precipNext.toFixed(1) + 'mm';
-
-    document.getElementById('weather-detail').innerHTML = `
-      <div class="weather-row"><span class="weather-row-label">Min / Max</span><span class="weather-row-val">${Math.round(minTemp)}° / ${Math.round(maxTemp)}°</span></div>
-      <div class="weather-row"><span class="weather-row-label">Wind</span><span class="weather-row-val">${Math.round(c.windspeed_10m)} km/u</span></div>
-      <div class="weather-row"><span class="weather-row-label">Luchtvochtigheid</span><span class="weather-row-val">${c.relativehumidity_2m}%</span></div>
-      <div class="weather-row"><span class="weather-row-label">Regen komend uur</span><span class="weather-row-val">${precipStr}</span></div>
-    `;
-
-  } catch(e) {
-    document.getElementById('weather-detail').innerHTML = '<div style="font-size:14px;color:var(--text-dim);padding:10px 0">Weer niet beschikbaar</div>';
+      '&current=temperature_2m,weathercode' +
+      '&forecast_days=1&timezone=Europe/Amsterdam'
+    );
+    const d = await r.json();
+    const temp = Math.round(d.current.temperature_2m);
+    const cond = WMO[d.current.weathercode] || '';
+    el.innerHTML = `Outside: ${hi(temp + '°C')}, ${hi(cond)}.`;
+  } catch {
+    el.innerHTML = `Outside: weather unavailable.`;
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  JONA SCHEDULE
-// ══════════════════════════════════════════════════════
-function loadJonaSchedule() {
-  const schedule = {
-    0: 'Papadag',
-    1: 'Papadag',
-    2: 'Opa & Omadag',
-    3: 'Mamadag',
-    4: 'Crèche',
-    5: 'Crèche',
-    6: 'Papadag'
-  };
-  const today = new Date().getDay();
-  const tomorrow = (today + 1) % 7;
-  const el = document.getElementById('jona-schedule');
-  el.innerHTML = `
-    <div class="jona-row">
-      <div class="card-label">Vandaag</div>
-      <div class="card-value">${schedule[today]}</div>
-    </div>
-    <div class="jona-row">
-      <div class="card-label">Morgen</div>
-      <div class="card-value">${schedule[tomorrow]}</div>
-    </div>
-  `;
-}
-
-// ══════════════════════════════════════════════════════
-//  LOCAL STORAGE HELPERS
-// ══════════════════════════════════════════════════════
-function lsGet(key, fallback) {
-  try {
-    const val = localStorage.getItem(key);
-    return val ? JSON.parse(val) : fallback;
-  } catch(e) {
-    return fallback;
-  }
-}
-
-function lsSet(key, val) {
-  try {
-    localStorage.setItem(key, JSON.stringify(val));
-  } catch(e) {}
-}
-
-// ══════════════════════════════════════════════════════
-//  QUICKLINKS
-// ══════════════════════════════════════════════════════
-function getQuicklinks() {
-  return lsGet('dmdf-quicklinks', []);
-}
-
-function saveQuicklinks(links) {
-  lsSet('dmdf-quicklinks', links);
-}
-
-function renderQuicklinks() {
-  const links = getQuicklinks();
-  const list = document.getElementById('quicklinks-list');
-  list.innerHTML = '';
-
-  links.forEach((link, i) => {
-    const pill = document.createElement('div');
-    pill.className = 'quicklink-pill';
-
-    const a = document.createElement('a');
-    a.href = /^https?:\/\//i.test(link.url) ? link.url : 'https://' + link.url;
-    a.textContent = link.name;
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'item-delete';
-    delBtn.textContent = '✕';
-    delBtn.title = 'Verwijder';
-    delBtn.onclick = () => deleteQuicklink(i);
-
-    pill.appendChild(a);
-    pill.appendChild(delBtn);
-    list.appendChild(pill);
+function buildActions() {
+  const container = document.getElementById('actions');
+  const actions = [];
+  if (isDesktop()) actions.push({ label: 'Check e-mail', href: 'https://mail.google.com' });
+  actions.push({ label: 'Look something up', href: 'https://duckduckgo.com' });
+  actions.push({ label: 'Read the news', href: 'https://nu.nl' });
+  actions.forEach(a => {
+    const link = document.createElement('a');
+    link.className = 'action-btn';
+    link.href = a.href;
+    link.textContent = a.label;
+    container.appendChild(link);
   });
-
-  updateQuicklinksVisibility();
 }
 
-function updateQuicklinksVisibility() {
-  // quicklinks row is always visible
-}
-
-function addQuicklink() {
-  const nameEl = document.getElementById('ql-name');
-  const urlEl  = document.getElementById('ql-url');
-  const name = nameEl.value.trim();
-  const url  = urlEl.value.trim();
-  if (!name || !url) return;
-
-  const links = getQuicklinks();
-  links.push({ name, url });
-  saveQuicklinks(links);
-  nameEl.value = '';
-  urlEl.value = '';
-  renderQuicklinks();
-}
-
-function deleteQuicklink(idx) {
-  const links = getQuicklinks();
-  links.splice(idx, 1);
-  saveQuicklinks(links);
-  renderQuicklinks();
-}
-
-// ══════════════════════════════════════════════════════
-//  TRAM DEPARTURES — OVapi (v0.ovapi.nl)
-// ══════════════════════════════════════════════════════
-function getStops() { return lsGet('dmdf-tram-stops', []); }
-function saveStops(s) { lsSet('dmdf-tram-stops', s); }
-
-async function fetchDepartures(code) {
-  const url = `https://v0.ovapi.nl/stopareacode/${encodeURIComponent(code)}/departures`;
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error('HTTP ' + resp.status);
-  return resp.json();
-}
-
-function parseDepartures(data) {
-  const now = new Date();
-  const deps = [];
-  Object.values(data).forEach(tpc => {
-    const stopName = tpc.Stop?.TimingPointName || '';
-    Object.values(tpc.Passes || {}).forEach(pass => {
-      const t = pass.ExpectedDepartureTime || pass.TargetDepartureTime;
-      if (!t) return;
-      const dt = new Date(t);
-      if (dt < now) return;
-      deps.push({
-        line: pass.LinePublicNumber || '?',
-        dest: pass.DestinationName50 || '',
-        time: dt,
-        stopName
-      });
-    });
-  });
-  deps.sort((a, b) => a.time - b.time);
-  return deps.slice(0, 8);
-}
-
-function fmtMin(dt) {
-  const m = Math.round((dt - new Date()) / 60000);
-  if (m <= 0) return 'nu';
-  return m + '\u202fmin';
-}
-
-async function loadTram() {
-  const stops = getStops();
-  const grid = document.getElementById('tram-grid');
-  grid.innerHTML = '';
-
-  if (stops.length === 0) {
-    grid.innerHTML = '<div style="color:var(--text-dim);font-size:14px;padding:4px 0;">Geen haltes — voeg een stopcode toe.</div>';
-    return;
-  }
-
-  await Promise.allSettled(stops.map(async (stop, i) => {
-    const card = document.createElement('div');
-    card.className = 'card';
-
-    const head = document.createElement('div');
-    head.className = 'tram-stop-head';
-    const nameSpan = document.createElement('span');
-    nameSpan.textContent = stop.label || stop.code;
-    head.appendChild(nameSpan);
-
-    const del = document.createElement('button');
-    del.className = 'stop-delete';
-    del.textContent = '✕';
-    del.onclick = () => deleteStop(i);
-    head.appendChild(del);
-
-    const body = document.createElement('div');
-
-    try {
-      const data = await fetchDepartures(stop.code);
-      const deps = parseDepartures(data);
-      if (deps.length === 0) {
-        body.innerHTML = '<div style="color:var(--text-dim);font-size:14px;padding:6px 0;">Geen vertrekken.</div>';
-      } else {
-        if (!stop.label && deps[0].stopName) nameSpan.textContent = deps[0].stopName;
-        deps.forEach(dep => {
-          const mins = Math.round((dep.time - new Date()) / 60000);
-          const row = document.createElement('div');
-          row.className = 'tram-row';
-          row.innerHTML = `
-            <span class="tram-line">${dep.line}</span>
-            <span class="tram-dest">${dep.dest}</span>
-            <span class="tram-time${mins <= 2 ? ' soon' : ''}">${fmtMin(dep.time)}</span>
-          `;
-          body.appendChild(row);
-        });
-      }
-    } catch(e) {
-      body.innerHTML = '<div style="color:var(--text-dim);font-size:14px;padding:6px 0;">Niet bereikbaar.</div>';
-    }
-
-    card.appendChild(head);
-    card.appendChild(body);
-    grid.appendChild(card);
-  }));
-
-  const now = new Date();
-  document.getElementById('tram-updated').textContent =
-    `bijgewerkt ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-}
-
-function addStop() {
-  const codeEl  = document.getElementById('stop-code');
-  const labelEl = document.getElementById('stop-label');
-  const code  = codeEl.value.trim().toUpperCase();
-  const label = labelEl.value.trim();
-  if (!code) return;
-  const stops = getStops();
-  stops.push({ code, label });
-  saveStops(stops);
-  codeEl.value = '';
-  labelEl.value = '';
-  loadTram();
-}
-
-function deleteStop(idx) {
-  const stops = getStops();
-  stops.splice(idx, 1);
-  saveStops(stops);
-  loadTram();
-}
-
-// ══════════════════════════════════════════════════════
-//  BOOT
-// ══════════════════════════════════════════════════════
 window.addEventListener('load', () => {
-  startClock();
+  tick();
+  setInterval(tick, 1000);
+  loadJona();
   loadWeather();
-  loadJonaSchedule();
-  renderQuicklinks();
-  loadTram();
-  setInterval(loadTram, 30000);
+  buildActions();
 });
 </script>
 </body>
