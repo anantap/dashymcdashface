@@ -75,14 +75,13 @@ body::before {
 }
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
-  justify-content: center;
 }
 
 .action-btn {
-  display: inline-block;
+  display: block;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
@@ -117,6 +116,7 @@ body::before {
 @media (max-width: 480px) {
   .greeting { font-size: 24px; }
   .page { padding: 32px 20px; }
+  .actions { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -156,10 +156,6 @@ function greeting(h) {
   return 'Good night.';
 }
 
-function isDesktop() {
-  return window.innerWidth > 768 && !('ontouchstart' in window);
-}
-
 function tick() {
   const now = new Date();
   const h = now.getHours();
@@ -195,10 +191,12 @@ async function loadWeather() {
 
 function buildActions() {
   const container = document.getElementById('actions');
-  const actions = [];
-  if (isDesktop()) actions.push({ label: 'Check e-mail', href: 'https://mail.google.com' });
-  actions.push({ label: 'Look something up', href: 'https://duckduckgo.com' });
-  actions.push({ label: 'Watch YouTube', href: 'https://youtube.com' });
+  const actions = [
+    { label: 'Check e-mail', href: 'https://mail.google.com' },
+    { label: 'Look something up', href: 'https://duckduckgo.com' },
+    { label: 'Watch YouTube', href: 'https://youtube.com' },
+    { label: 'Think before you buy', href: 'https://mindful-cart.vercel.app' },
+  ];
   actions.forEach(a => {
     const link = document.createElement('a');
     link.className = 'action-btn';
