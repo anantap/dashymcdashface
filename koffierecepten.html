@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pour-over Brouwtabel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: #0e0e0e;
+color: #c8c8c8;
+font-family: 'IBM Plex Mono', monospace;
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 2rem;
+}
+
+.wrap { width: 100%; max-width: 580px; }
+
+.title {
+font-size: 0.65rem;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: #888;
+margin-bottom: 1.5rem;
+}
+
+.sub-label {
+font-size: 0.6rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: #555;
+margin-top: 1.8rem;
+margin-bottom: 0.6rem;
+}
+
+hr {
+border: none;
+border-top: 1px solid #1a1a1a;
+margin: 2.5rem 0;
+}
+
+/* Selector */
+.selector {
+display: flex;
+align-items: center;
+gap: 0;
+margin-bottom: 1.5rem;
+border: 1px solid #2a2a2a;
+display: inline-flex;
+}
+
+.selector button {
+background: none;
+border: none;
+color: #666;
+font-family: 'IBM Plex Mono', monospace;
+font-size: 0.75rem;
+padding: 0.5rem 0.8rem;
+cursor: pointer;
+transition: color 0.15s;
+}
+
+.selector button:hover { color: #ccc; }
+
+.selector-label {
+font-size: 0.75rem;
+color: #e0e0e0;
+padding: 0.5rem 1rem;
+border-left: 1px solid #2a2a2a;
+border-right: 1px solid #2a2a2a;
+min-width: 160px;
+text-align: center;
+font-weight: 500;
+}
+
+/* Stats row */
+.stats {
+display: flex;
+gap: 2.5rem;
+margin-bottom: 1.8rem;
+}
+
+.stat-item { display: flex; flex-direction: column; gap: 0.25rem; }
+
+.stat-key {
+font-size: 0.6rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: #555;
+}
+
+.stat-val {
+font-size: 0.85rem;
+color: #e0e0e0;
+font-weight: 500;
+}
+
+/* Tables */
+table {
+width: 100%;
+border-collapse: collapse;
+font-size: 0.8rem;
+}
+
+th {
+text-align: left;
+font-size: 0.6rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: #777;
+padding: 0 0 0.6rem 0;
+font-weight: 400;
+border-bottom: 1px solid #2a2a2a;
+}
+
+th:not(:first-child) { padding-left: 1.5rem; }
+
+td {
+padding: 0.75rem 0;
+border-bottom: 1px solid #1e1e1e;
+color: #bbb;
+font-weight: 300;
+}
+
+td:not(:first-child) { padding-left: 1.5rem; }
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { color: #eee; }
+
+.time  { color: #e0e0e0; font-weight: 500; font-variant-numeric: tabular-nums; }
+.vol   { color: #e0e0e0; }
+.note  { color: #666; }
+
+.footer {
+margin-top: 2rem;
+font-size: 0.6rem;
+letter-spacing: 0.1em;
+color: #555;
+text-transform: uppercase;
+line-height: 1.8;
+}
+
+.footer span { color: #999; }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <!-- STANLEY -->
+
+  <div class="title">Stanley 0,59L · Hario Mini Slim · 1:16 · Metalen filter · Stand 7–10</div>
+
+  <div class="selector">
+    <button onclick="prev()">&#8249;</button>
+    <div class="selector-label" id="sel-label">2 koppen · 400 ml</div>
+    <button onclick="next()">&#8250;</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-item">
+      <span class="stat-key">Water</span>
+      <span class="stat-val" id="s-water">400 ml</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-key">Koffie</span>
+      <span class="stat-val" id="s-koffie">24 g</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-key">Malen</span>
+      <span class="stat-val" id="s-malen">1×</span>
+    </div>
+  </div>
+
+  <div class="sub-label">Stappenplan</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Tijd</th>
+        <th>Stap</th>
+        <th>Tot</th>
+        <th>Notitie</th>
+      </tr>
+    </thead>
+    <tbody id="stanley-steps"></tbody>
+  </table>
+
+  <hr>
+
+  <!-- OREA O1 -->
+
+  <div class="title">Orea O1 · Hario Mini Slim · 1:16 · Papieren filter 155 · Stand 7</div>
+
+  <div class="stats">
+    <div class="stat-item">
+      <span class="stat-key">Water</span>
+      <span class="stat-val">300 ml</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-key">Koffie</span>
+      <span class="stat-val">18 g</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-key">Bloom</span>
+      <span class="stat-val">40 ml</span>
+    </div>
+  </div>
+
+  <div class="sub-label">Stappenplan · 2 kleine koppen</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Tijd</th>
+        <th>Stap</th>
+        <th>Tot</th>
+        <th>Notitie</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="time">0:00</td>
+        <td>Filter nat</td>
+        <td class="vol">—</td>
+        <td class="note">Water door filter, weggooien</td>
+      </tr>
+      <tr>
+        <td class="time">0:00</td>
+        <td>Bloom</td>
+        <td class="vol">40 ml</td>
+        <td class="note">30–45 sec wachten</td>
+      </tr>
+      <tr>
+        <td class="time">0:45</td>
+        <td>Pour 2</td>
+        <td class="vol">180 ml</td>
+        <td class="note">Rondje gieten</td>
+      </tr>
+      <tr>
+        <td class="time">1:30</td>
+        <td>Pour 3</td>
+        <td class="vol">300 ml</td>
+        <td class="note">Rondje gieten</td>
+      </tr>
+      <tr>
+        <td class="time">~2:30–3:00</td>
+        <td>Klaar</td>
+        <td class="vol">—</td>
+        <td class="note">Laat volledig draineren</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    Zuur → <span>grover</span> &nbsp;·&nbsp; Bitter → <span>fijner</span><br>
+    Metalen filter: iets grover &nbsp;·&nbsp; Papier: iets fijner &nbsp;·&nbsp; Water: ~93°C
+  </div>
+
+</div>
+
+<script>
+  const presets = [
+    { label: '1 kop · 250 ml',  water: 250, koffie: 15, malen: '1×' },
+    { label: '2 koppen · 400 ml', water: 400, koffie: 24, malen: '1×' },
+    { label: '3 koppen · 500 ml', water: 500, koffie: 30, malen: '2×' },
+    { label: 'Vol · 590 ml',     water: 590, koffie: 37, malen: '2×' },
+  ];
+
+  let idx = 1;
+
+  function render() {
+    const p = presets[idx];
+    document.getElementById('sel-label').textContent = p.label;
+    document.getElementById('s-water').textContent = p.water + ' ml';
+    document.getElementById('s-koffie').textContent = p.koffie + ' g';
+    document.getElementById('s-malen').textContent = p.malen;
+
+    const w = p.water;
+    const p1 = Math.round(w / 3 / 10) * 10;
+    const p2 = Math.round(w * 2 / 3 / 10) * 10;
+    const p3 = w;
+
+    const rows = [
+      ['0:00', 'Pour 1', p1 + ' ml', 'Rondje gieten'],
+      ['0:45', 'Pour 2', p2 + ' ml', 'Rondje gieten'],
+      ['1:30', 'Pour 3', p3 + ' ml', 'Rondje gieten'],
+      ['~2:30', 'Klaar', '—', 'Filter eraf, genieten'],
+    ];
+
+    document.getElementById('stanley-steps').innerHTML = rows.map(r => `
+      <tr>
+        <td class="time">${r[0]}</td>
+        <td>${r[1]}</td>
+        <td class="vol">${r[2]}</td>
+        <td class="note">${r[3]}</td>
+      </tr>
+    `).join('');
+  }
+
+  function prev() { idx = (idx - 1 + presets.length) % presets.length; render(); }
+  function next() { idx = (idx + 1) % presets.length; render(); }
+
+  render();
+</script>
+
+</body>
+</html>
